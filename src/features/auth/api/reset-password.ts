@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
-import { meQueryKey } from './get-me';
+import { clearUserData } from './get-me';
 
 type ResetPasswordRequest = { token: string; password: string };
 
@@ -15,6 +15,6 @@ export function useResetPassword() {
   return useMutation({
     mutationFn: resetPassword,
     // The backend ended every session of this user (including this browser's), so nobody is logged in
-    onSuccess: () => queryClient.setQueryData(meQueryKey, null),
+    onSuccess: () => clearUserData(queryClient),
   });
 }
