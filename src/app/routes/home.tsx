@@ -1,7 +1,9 @@
 import { BoardsList } from '@/features/boards/components/boards-list';
 import { CreateBoardDialog } from '@/features/boards/components/create-board-dialog';
+import { BoardTasks } from '@/features/tasks/components/board-tasks';
 
-// Home combines features: boards now; tasks, search and the dashboard in later phases
+// Home is where features are combined: boards, with each board's tasks inside.
+// (Search, filters and the dashboard join in later phases.)
 export function HomeRoute() {
   return (
     <div className="flex flex-col gap-6">
@@ -12,7 +14,7 @@ export function HomeRoute() {
         </div>
         <CreateBoardDialog />
       </div>
-      <BoardsList />
+      <BoardsList renderBoardContent={(board) => <BoardTasks board={board} />} />
     </div>
   );
 }

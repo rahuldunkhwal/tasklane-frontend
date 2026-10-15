@@ -1,6 +1,7 @@
 // Shapes of what the backend sends back. Keep them in sync with the backend:
 //   User         → backend/src/modules/users/user.dto.ts (toPublicUser)
 //   Board        → backend/src/modules/boards/board.dto.ts (toBoardDto)
+//   Task         → backend/src/modules/tasks/task.dto.ts (toTaskDto)
 //   ApiErrorBody → backend/src/middleware/errorHandler.ts
 
 export type User = {
@@ -14,6 +15,21 @@ export type User = {
 export type Board = {
   id: string;
   title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TaskPriority = 'low' | 'medium' | 'high';
+
+export type Task = {
+  id: string;
+  boardId: string;
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  dueDate: string | null; // the END of the due day in the user's time zone, as an ISO date-time
+  completed: boolean;
+  order: number;
   createdAt: string;
   updatedAt: string;
 };
