@@ -62,6 +62,42 @@ export function toFormValues(task: Task): TaskFormValues {
   };
 }
 
+// ---------- Drag & drop ----------
+
+// Each column's drop zone is named "board:<id>", so it can't be confused with a task id
+const DROP_PREFIX = 'board:';
+export const boardDropId = (boardId: string) => `${DROP_PREFIX}${boardId}`;
+
+// Which board an id belongs to: a column's drop zone, or a task (looked up in the list)
+export function boardIdOf(tasks: Task[], id: string): string | undefined {
+  if (id.startsWith(DROP_PREFIX)) return id.slice(DROP_PREFIX.length);
+  return tasks.find((t) => t.id === id)?.boardId;
+}
+
+// The cache holds ONE flat list of every task; each column shows its board's tasks in list order.
+// This returns a new list where the task sits in `boardId` at position `index` of that board.
+export function placeTask(tasks: Task[], taskId: string, boardId: string, index: number): Task[] {
+  const task = tasks.find((t) => t.id === taskId);
+  if (!task) return tasks;
+
+  const rest = tasks.filter((t) => t.id !== taskId);
+  const moved = { ...task, boardId };
+  // Insert just before the task that is currently at that position in the board...
+  const anchor = rest.filter((t) => t.boardId === boardId)[index];
+  if (!anchor) return [...rest, moved]; // ...or after everything (= last in that board)
+
+  const anchorAt = rest.indexOf(anchor);
+  return [...rest.slice(0, anchorAt), moved, ...rest.slice(anchorAt)];
+}
+
+// Where a task currently is: its board and its position (0 = top) among that board's tasks
+export function positionOf(tasks: Task[], taskId: string) {
+  const task = tasks.find((t) => t.id === taskId);
+  if (!task) return null;
+  const index = tasks.filter((t) => t.boardId === task.boardId).findIndex((t) => t.id === taskId);
+  return { boardId: task.boardId, index };
+}
+
 export const PRIORITY_LABELS: Record<TaskPriority, string> = {
   low: 'Low',
   medium: 'Medium',

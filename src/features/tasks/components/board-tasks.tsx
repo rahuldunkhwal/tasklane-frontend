@@ -1,7 +1,11 @@
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import type { Board } from '@/types/api';
 import { useTasks } from '../api/get-tasks';
+import { boardDropId } from '../utils';
 import { AddTaskDialog } from './add-task-dialog';
 import { TaskCard } from './task-card';
 
@@ -9,6 +13,9 @@ import { TaskCard } from './task-card';
 // only one request: they all read the same cached list and keep their own board's tasks.
 export function BoardTasks({ board }: { board: Board }) {
   const tasks = useTasks();
+
+  // The whole task area is a drop zone, so tasks can be dropped even into an EMPTY column
+  const { setNodeRef, isOver } = useDroppable({ id: boardDropId(board.id) });
 
   if (tasks.isPending) {
     return (
@@ -30,24 +37,37 @@ export function BoardTasks({ board }: { board: Board }) {
     );
   }
 
-  // The server already sorts by board and position, so filtering keeps the right order
+  // The cached list is already in the right order, so filtering keeps each board's order
   const boardTasks = tasks.data.filter((task) => task.boardId === board.id);
 
   return (
     <div className="flex flex-col gap-2">
-      {boardTasks.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-          No tasks yet
-        </p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {boardTasks.map((task) => (
-            <li key={task.id}>
-              <TaskCard task={task} />
+      {/* SortableContext: these cards can be reordered, and dnd-kit animates the others out of the way */}
+      <SortableContext
+        id={board.id}
+        items={boardTasks.map((task) => task.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <ul
+          ref={setNodeRef}
+          className={cn(
+            'flex min-h-16 flex-col gap-2 rounded-lg transition-colors',
+            isOver && 'bg-muted/60', // light highlight while a task hovers over this column
+          )}
+        >
+          {boardTasks.length === 0 ? (
+            <li className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
+              No tasks yet
             </li>
-          ))}
+          ) : (
+            boardTasks.map((task) => (
+              <li key={task.id}>
+                <TaskCard task={task} />
+              </li>
+            ))
+          )}
         </ul>
-      )}
+      </SortableContext>
       <AddTaskDialog board={board} />
     </div>
   );
