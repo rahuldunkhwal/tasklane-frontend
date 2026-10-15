@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router';
+import { AppLayout } from '@/app/layouts/app-layout';
 import { AuthLayout } from '@/components/layouts/auth-layout';
 import { ProtectedRoute } from '@/features/auth/components/protected-route';
 import { PublicOnlyRoute } from '@/features/auth/components/public-only-route';
@@ -34,12 +35,17 @@ export const router = createBrowserRouter([
     children: [{ path: '/reset-password', element: <ResetPasswordRoute /> }],
   },
 
-  // Only for logged-IN users (logged-out users are sent to /login)
+  // Only for logged-IN users (logged-out users are sent to /login), inside the top-bar layout
   {
     element: <ProtectedRoute />,
     children: [
-      { path: '/', element: <HomeRoute /> },
-      { path: '/profile', element: <ProfileRoute /> },
+      {
+        element: <AppLayout />,
+        children: [
+          { path: '/', element: <HomeRoute /> },
+          { path: '/profile', element: <ProfileRoute /> },
+        ],
+      },
     ],
   },
 
