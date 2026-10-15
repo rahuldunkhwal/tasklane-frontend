@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { api } from '@/lib/api-client';
 import type { User } from '@/types/api';
@@ -16,6 +16,14 @@ export async function getMe(): Promise<User | null> {
     if (isAxiosError(error) && error.response?.status === 401) return null;
     throw error; // server down, 500, ...: a real error
   }
+}
+
+// Used after logout, password reset, or an expired session: mark "nobody is logged in"
+// (the guards then redirect) and forget everything cached for that user (boards, tasks, ...),
+// so the next person on this browser never sees it, not even for a split second.
+export function clearUserData(queryClient: QueryClient) {
+  queryClient.setQueryData(meQueryKey, null);
+  queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== 'auth' });
 }
 
 // Asked once when the app loads, then shared by every component that calls useMe()
