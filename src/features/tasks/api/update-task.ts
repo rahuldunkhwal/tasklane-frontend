@@ -26,9 +26,13 @@ export function useUpdateTask() {
     onMutate: async ({ id, ...changes }) => {
       // Stop any refetch in progress, so an older answer can't overwrite our change
       await queryClient.cancelQueries({ queryKey: tasksQueryKey });
-      const previous = queryClient.getQueriesData<Task[]>({ queryKey: tasksQueryKey }); // for rollback
-      queryClient.setQueriesData<Task[]>({ queryKey: tasksQueryKey }, (tasks) =>
-        tasks?.map((task) => (task.id === id ? { ...task, ...changes } : task)),
+      const previous = queryClient.getQueriesData({ queryKey: tasksQueryKey }); // for rollback
+      queryClient.setQueriesData({ queryKey: tasksQueryKey }, (data: unknown) =>
+        // The dashboard counts also live under 'tasks' but aren't a list: leave them alone
+        // (they're recomputed by the server when everything is reloaded in step 3)
+        Array.isArray(data)
+          ? (data as Task[]).map((task) => (task.id === id ? { ...task, ...changes } : task))
+          : data,
       );
       return { previous };
     },
