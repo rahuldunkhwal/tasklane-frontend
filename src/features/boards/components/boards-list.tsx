@@ -1,7 +1,9 @@
 import { LayoutGridIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getErrorMessage } from '@/lib/api-client';
+import type { Board } from '@/types/api';
 import { useBoards } from '../api/get-boards';
 import { BoardColumn } from './board-column';
 import { CreateBoardDialog } from './create-board-dialog';
@@ -9,7 +11,13 @@ import { CreateBoardDialog } from './create-board-dialog';
 // Phones: boards stacked top to bottom. Tablets and up (md:): side by side, scrolling sideways.
 const columnsLayout = 'flex flex-col gap-4 md:flex-row md:items-start md:overflow-x-auto md:pb-4';
 
-export function BoardsList() {
+type BoardsListProps = {
+  // What to show inside each board column. Passed in by the page (Home puts the tasks there),
+  // so the boards feature never has to import the tasks feature.
+  renderBoardContent?: (board: Board) => ReactNode;
+};
+
+export function BoardsList({ renderBoardContent }: BoardsListProps) {
   const boards = useBoards();
 
   // 1. Loading: grey shapes where the columns will appear (feels faster than a spinner)
@@ -53,7 +61,9 @@ export function BoardsList() {
   return (
     <div className={columnsLayout}>
       {boards.data.map((board) => (
-        <BoardColumn key={board.id} board={board} />
+        <BoardColumn key={board.id} board={board}>
+          {renderBoardContent?.(board)}
+        </BoardColumn>
       ))}
     </div>
   );

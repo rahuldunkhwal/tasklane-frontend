@@ -1,5 +1,5 @@
 import { MoreHorizontalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,8 +11,15 @@ import type { Board } from '@/types/api';
 import { DeleteBoardDialog } from './delete-board-dialog';
 import { RenameBoardDialog } from './rename-board-dialog';
 
-// One board shown as a column (like Trello). Tasks will be listed inside it in a later phase.
-export function BoardColumn({ board }: { board: Board }) {
+type BoardColumnProps = {
+  board: Board;
+  // What goes inside the column (the tasks). The boards feature doesn't know about tasks:
+  // the page that uses both (Home) fills this slot.
+  children?: ReactNode;
+};
+
+// One board shown as a column (like Trello)
+export function BoardColumn({ board, children }: BoardColumnProps) {
   // Which dialog is open. The dialogs sit OUTSIDE the menu: the menu closes when an item is
   // chosen, and a dialog inside it would close with it.
   const [renameOpen, setRenameOpen] = useState(false);
@@ -46,9 +53,7 @@ export function BoardColumn({ board }: { board: Board }) {
         </DropdownMenu>
       </div>
 
-      <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-        No tasks yet
-      </p>
+      {children}
 
       <RenameBoardDialog board={board} open={renameOpen} onOpenChange={setRenameOpen} />
       <DeleteBoardDialog board={board} open={deleteOpen} onOpenChange={setDeleteOpen} />

@@ -36,7 +36,7 @@ export function DeleteBoardDialog({ board, open, onOpenChange }: DeleteBoardDial
         <AlertDialogHeader>
           <AlertDialogTitle>Delete “{board.title}”?</AlertDialogTitle>
           <AlertDialogDescription>
-            This board will be deleted permanently. This can't be undone.
+            The board and all its tasks will be deleted permanently. This can't be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
