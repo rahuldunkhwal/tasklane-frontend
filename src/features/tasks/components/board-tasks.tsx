@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import type { Board } from '@/types/api';
 import { useTasks } from '../api/get-tasks';
+import { useTaskFilters } from '../filters';
 import { boardDropId } from '../utils';
 import { AddTaskDialog } from './add-task-dialog';
 import { TaskCard } from './task-card';
@@ -12,7 +13,9 @@ import { TaskCard } from './task-card';
 // The tasks of ONE board, plus "+ Add task". Every column renders this, but there's still
 // only one request: they all read the same cached list and keep their own board's tasks.
 export function BoardTasks({ board }: { board: Board }) {
-  const tasks = useTasks();
+  // Same filters as the filter bar (read from the URL) → same cached request
+  const { filters, filtering } = useTaskFilters();
+  const tasks = useTasks(filters);
 
   // The whole task area is a drop zone, so tasks can be dropped even into an EMPTY column
   const { setNodeRef, isOver } = useDroppable({ id: boardDropId(board.id) });
@@ -57,12 +60,14 @@ export function BoardTasks({ board }: { board: Board }) {
         >
           {boardTasks.length === 0 ? (
             <li className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-              No tasks yet
+              {filtering ? 'No matching tasks' : 'No tasks yet'}
             </li>
           ) : (
             boardTasks.map((task) => (
               <li key={task.id}>
-                <TaskCard task={task} />
+                {/* While filtering, some tasks are hidden, so "position 2" would be ambiguous:
+                    dragging is switched off until the filters are cleared */}
+                <TaskCard task={task} dragDisabled={filtering} />
               </li>
             ))
           )}
