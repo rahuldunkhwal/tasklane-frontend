@@ -1,5 +1,6 @@
 // Shapes of what the backend sends back. Keep them in sync with the backend:
 //   User         → backend/src/modules/users/user.dto.ts (toPublicUser)
+//   Board        → backend/src/modules/boards/board.dto.ts (toBoardDto)
 //   ApiErrorBody → backend/src/middleware/errorHandler.ts
 
 export type User = {
@@ -7,6 +8,14 @@ export type User = {
   name: string;
   email: string;
   createdAt: string; // dates arrive as text in JSON, e.g. "2026-10-15T10:21:22.036Z"
+};
+
+// Shared here (not in features/boards) because tasks will also need it
+export type Board = {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ApiErrorDetail = { path: string; message: string };
