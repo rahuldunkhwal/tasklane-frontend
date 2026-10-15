@@ -3,10 +3,11 @@ import { CreateBoardDialog } from '@/features/boards/components/create-board-dia
 import { BoardTasks } from '@/features/tasks/components/board-tasks';
 import { TaskDragAndDrop } from '@/features/tasks/components/task-drag-and-drop';
 import { TaskFiltersBar } from '@/features/tasks/components/task-filters-bar';
+import { TaskStatsCards } from '@/features/tasks/components/task-stats-cards';
 
-// Home is where features are combined: a search/filter bar, then the boards with each board's
-// tasks inside, all wrapped in drag & drop so tasks can move within and between boards.
-// (The dashboard joins in a later phase.)
+// Home is where features are combined: the dashboard summary, a search/filter bar, then the
+// boards with each board's tasks inside, all wrapped in drag & drop so tasks can move within
+// and between boards.
 export function HomeRoute() {
   return (
     <div className="flex flex-col gap-6">
@@ -19,6 +20,7 @@ export function HomeRoute() {
         </div>
         <CreateBoardDialog />
       </div>
+      <TaskStatsCards />
       <TaskFiltersBar />
       <TaskDragAndDrop>
         <BoardsList renderBoardContent={(board) => <BoardTasks board={board} />} />

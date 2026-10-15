@@ -34,6 +34,9 @@ export type Task = {
   updatedAt: string;
 };
 
+// Dashboard counts → backend GET /api/tasks/stats
+export type TaskStats = { total: number; completed: number; overdue: number };
+
 export type ApiErrorDetail = { path: string; message: string };
 
 // Every error from our API has exactly this shape
