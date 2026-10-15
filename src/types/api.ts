@@ -11,13 +11,18 @@ export type User = {
   createdAt: string; // dates arrive as text in JSON, e.g. "2026-10-15T10:21:22.036Z"
 };
 
-// Shared here (not in features/boards) because tasks will also need it
+// Shared here (not in features/boards) because tasks also need it
 export type Board = {
   id: string;
   title: string;
+  role: 'owner' | 'viewer'; // viewer = shared with me, view-only
+  ownerName?: string; // only on boards shared with me ("Shared by Alice")
   createdAt: string;
   updatedAt: string;
 };
+
+// One person a board is shared with → backend board.dto.ts (ShareDto)
+export type Share = { userId: string; name: string; email: string };
 
 export type TaskPriority = 'low' | 'medium' | 'high';
 
