@@ -1,22 +1,31 @@
-import { CalendarIcon } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVerticalIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getErrorMessage } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import type { Task } from '@/types/api';
 import { useUpdateTask } from '../api/update-task';
-import { formatDueDate, isOverdue, PRIORITY_LABELS } from '../utils';
 import { EditTaskDialog } from './edit-task-dialog';
-
-// Red is kept for "Overdue", so priorities use calmer styles
-const PRIORITY_BADGE = { high: 'default', medium: 'secondary', low: 'outline' } as const;
+import { TaskSummary } from './task-summary';
 
 export function TaskCard({ task }: { task: Task }) {
   const updateTask = useUpdateTask();
   const [editOpen, setEditOpen] = useState(false);
-  const overdue = isOverdue(task);
+
+  // Makes this card draggable and sortable. dnd-kit tells us how far to shift it (transform)
+  // while things move, and whether it's the one being dragged right now.
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id });
 
   // Ticks instantly (optimistic update); if the server refuses, it un-ticks and a toast explains
   const toggleCompleted = (completed: boolean) =>
@@ -29,7 +38,28 @@ export function TaskCard({ task }: { task: Task }) {
     );
 
   return (
-    <article className="flex gap-3 rounded-lg border bg-background p-3 shadow-xs">
+    <article
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      // The card being dragged stays as a faded placeholder; a floating copy follows the pointer
+      className={cn(
+        'flex gap-2 rounded-lg border bg-background p-3 shadow-xs',
+        isDragging && 'opacity-40',
+      )}
+    >
+      {/* Drag handle: the ONLY place a drag starts (mouse, touch or keyboard: Space, arrows, Space).
+          touch-none: on phones, touching here drags instead of scrolling the page. */}
+      <button
+        type="button"
+        ref={setActivatorNodeRef}
+        {...attributes}
+        {...listeners}
+        aria-label={`Move "${task.title}"`}
+        className="-ml-1 flex h-5 cursor-grab touch-none items-center rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing"
+      >
+        <GripVerticalIcon className="size-4" />
+      </button>
+
       <Checkbox
         className="mt-0.5"
         checked={task.completed}
@@ -37,44 +67,29 @@ export function TaskCard({ task }: { task: Task }) {
         aria-label={`Mark "${task.title}" as ${task.completed ? 'not done' : 'done'}`}
       />
 
-      {/* The rest of the card is one button that opens the edit dialog
-          (kept separate from the checkbox, so ticking doesn't open it) */}
+      {/* Clicking the text opens the edit dialog */}
       <button
         type="button"
         onClick={() => setEditOpen(true)}
         className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-sm text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <span
-          className={cn(
-            'text-sm break-words',
-            task.completed && 'text-muted-foreground line-through',
-          )}
-        >
-          {task.title}
-        </span>
-
-        {task.description && (
-          <span className="line-clamp-2 text-xs text-muted-foreground">{task.description}</span>
-        )}
-
-        <span className="flex flex-wrap items-center gap-1.5">
-          <Badge variant={PRIORITY_BADGE[task.priority]}>{PRIORITY_LABELS[task.priority]}</Badge>
-          {task.dueDate && (
-            <span
-              className={cn(
-                'flex items-center gap-1 text-xs',
-                overdue ? 'text-destructive' : 'text-muted-foreground',
-              )}
-            >
-              <CalendarIcon className="size-3" />
-              {formatDueDate(task.dueDate)}
-            </span>
-          )}
-          {overdue && <Badge variant="destructive">Overdue</Badge>}
-        </span>
+        <TaskSummary task={task} />
       </button>
 
       <EditTaskDialog task={task} open={editOpen} onOpenChange={setEditOpen} />
     </article>
+  );
+}
+
+// The floating copy that follows the pointer while dragging (looks the same, does nothing)
+export function TaskCardPreview({ task }: { task: Task }) {
+  return (
+    <div className="flex cursor-grabbing gap-2 rounded-lg border bg-background p-3 shadow-lg">
+      <GripVerticalIcon className="-ml-1 size-4 text-muted-foreground" />
+      <Checkbox className="mt-0.5" checked={task.completed} tabIndex={-1} aria-hidden />
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <TaskSummary task={task} />
+      </div>
+    </div>
   );
 }
