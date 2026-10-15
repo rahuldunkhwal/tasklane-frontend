@@ -1,5 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { Toaster } from 'sonner';
 import { clearUserData } from '@/features/auth/api/get-me';
 import { setUnauthorizedHandler } from '@/lib/api-client';
 import { queryClient } from '@/lib/react-query';
@@ -8,7 +9,13 @@ import { queryClient } from '@/lib/react-query';
 // "nobody is logged in" → ProtectedRoute then sends the user to /login.
 setUnauthorizedHandler(() => clearUserData(queryClient));
 
-// Everything the whole app needs around it (later also: toast notifications)
+// Everything the whole app needs around it
 export function AppProvider({ children }: { children: ReactNode }) {
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      {/* Where toast messages appear (e.g. "Couldn't update the task"); richColors = red for errors */}
+      <Toaster richColors />
+    </QueryClientProvider>
+  );
 }
