@@ -1,0 +1,21 @@
+// Shapes of what the backend sends back. Keep them in sync with the backend:
+//   User         → backend/src/modules/users/user.dto.ts (toPublicUser)
+//   ApiErrorBody → backend/src/middleware/errorHandler.ts
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string; // dates arrive as text in JSON, e.g. "2026-10-15T10:21:22.036Z"
+};
+
+export type ApiErrorDetail = { path: string; message: string };
+
+// Every error from our API has exactly this shape
+export type ApiErrorBody = {
+  error: {
+    code: string; // stable code to check in code, e.g. 'EMAIL_TAKEN'
+    message: string; // human-readable message to show
+    details?: ApiErrorDetail[]; // per-field messages for validation errors
+  };
+};

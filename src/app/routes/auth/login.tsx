@@ -1,25 +1,6 @@
-import { Link } from 'react-router';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoginForm } from '@/features/auth/components/login-form';
 
-// Placeholder: the real login form arrives in Step 3
+// Thin page: the form lives in the auth feature; this file only connects it to the /login URL
 export function LoginRoute() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Log in</CardTitle>
-        <CardDescription>The login form comes in Step 3.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2 text-sm">
-        <Link to="/signup" className="underline">
-          Go to sign up
-        </Link>
-        <Link to="/forgot-password" className="underline">
-          Go to forgot password
-        </Link>
-        <Link to="/" className="underline">
-          Go to home
-        </Link>
-      </CardContent>
-    </Card>
-  );
+  return <LoginForm />;
 }
