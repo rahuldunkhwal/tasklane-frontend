@@ -11,7 +11,12 @@ import { useUpdateTask } from '../api/update-task';
 import { EditTaskDialog } from './edit-task-dialog';
 import { TaskSummary } from './task-summary';
 
-export function TaskCard({ task }: { task: Task }) {
+type TaskCardProps = {
+  task: Task;
+  dragDisabled?: boolean; // true while filtering: no handle, can't be dragged
+};
+
+export function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
   const updateTask = useUpdateTask();
   const [editOpen, setEditOpen] = useState(false);
 
@@ -25,7 +30,7 @@ export function TaskCard({ task }: { task: Task }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id });
+  } = useSortable({ id: task.id, disabled: dragDisabled });
 
   // Ticks instantly (optimistic update); if the server refuses, it un-ticks and a toast explains
   const toggleCompleted = (completed: boolean) =>
@@ -48,17 +53,20 @@ export function TaskCard({ task }: { task: Task }) {
       )}
     >
       {/* Drag handle: the ONLY place a drag starts (mouse, touch or keyboard: Space, arrows, Space).
-          touch-none: on phones, touching here drags instead of scrolling the page. */}
-      <button
-        type="button"
-        ref={setActivatorNodeRef}
-        {...attributes}
-        {...listeners}
-        aria-label={`Move "${task.title}"`}
-        className="-ml-1 flex h-5 cursor-grab touch-none items-center rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing"
-      >
-        <GripVerticalIcon className="size-4" />
-      </button>
+          touch-none: on phones, touching here drags instead of scrolling the page.
+          Hidden while filtering, because dragging is switched off then. */}
+      {!dragDisabled && (
+        <button
+          type="button"
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          aria-label={`Move "${task.title}"`}
+          className="-ml-1 flex h-5 cursor-grab touch-none items-center rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing"
+        >
+          <GripVerticalIcon className="size-4" />
+        </button>
+      )}
 
       <Checkbox
         className="mt-0.5"
