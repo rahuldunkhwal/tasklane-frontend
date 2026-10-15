@@ -16,9 +16,12 @@ export function BoardTasks({ board }: { board: Board }) {
   // Same filters as the filter bar (read from the URL) → same cached request
   const { filters, filtering } = useTaskFilters();
   const tasks = useTasks(filters);
+  // A board shared with me is view-only: nothing in it can be changed (the server enforces it too)
+  const readOnly = board.role === 'viewer';
 
-  // The whole task area is a drop zone, so tasks can be dropped even into an EMPTY column
-  const { setNodeRef, isOver } = useDroppable({ id: boardDropId(board.id) });
+  // The whole task area is a drop zone, so tasks can be dropped even into an EMPTY column.
+  // Switched off for view-only boards, so tasks can't be dropped into them.
+  const { setNodeRef, isOver } = useDroppable({ id: boardDropId(board.id), disabled: readOnly });
 
   if (tasks.isPending) {
     return (
@@ -67,13 +70,13 @@ export function BoardTasks({ board }: { board: Board }) {
               <li key={task.id}>
                 {/* While filtering, some tasks are hidden, so "position 2" would be ambiguous:
                     dragging is switched off until the filters are cleared */}
-                <TaskCard task={task} dragDisabled={filtering} />
+                <TaskCard task={task} dragDisabled={filtering} readOnly={readOnly} />
               </li>
             ))
           )}
         </ul>
       </SortableContext>
-      <AddTaskDialog board={board} />
+      {!readOnly && <AddTaskDialog board={board} />}
     </div>
   );
 }

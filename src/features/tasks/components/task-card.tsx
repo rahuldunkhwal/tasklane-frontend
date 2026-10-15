@@ -14,11 +14,13 @@ import { TaskSummary } from './task-summary';
 type TaskCardProps = {
   task: Task;
   dragDisabled?: boolean; // true while filtering: no handle, can't be dragged
+  readOnly?: boolean; // true on boards shared with me: can't tick, edit or drag
 };
 
-export function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
+export function TaskCard({ task, dragDisabled = false, readOnly = false }: TaskCardProps) {
   const updateTask = useUpdateTask();
   const [editOpen, setEditOpen] = useState(false);
+  const noDrag = dragDisabled || readOnly;
 
   // Makes this card draggable and sortable. dnd-kit tells us how far to shift it (transform)
   // while things move, and whether it's the one being dragged right now.
@@ -30,7 +32,7 @@ export function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id, disabled: dragDisabled });
+  } = useSortable({ id: task.id, disabled: noDrag }); // disabled = can't be dragged OR dropped onto
 
   // Ticks instantly (optimistic update); if the server refuses, it un-ticks and a toast explains
   const toggleCompleted = (completed: boolean) =>
@@ -54,8 +56,8 @@ export function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
     >
       {/* Drag handle: the ONLY place a drag starts (mouse, touch or keyboard: Space, arrows, Space).
           touch-none: on phones, touching here drags instead of scrolling the page.
-          Hidden while filtering, because dragging is switched off then. */}
-      {!dragDisabled && (
+          Hidden while filtering and on view-only boards, because dragging is switched off then. */}
+      {!noDrag && (
         <button
           type="button"
           ref={setActivatorNodeRef}
@@ -71,20 +73,29 @@ export function TaskCard({ task, dragDisabled = false }: TaskCardProps) {
       <Checkbox
         className="mt-0.5"
         checked={task.completed}
+        disabled={readOnly} // view-only: shows done / not done, but can't be changed
         onCheckedChange={(checked) => toggleCompleted(checked === true)}
         aria-label={`Mark "${task.title}" as ${task.completed ? 'not done' : 'done'}`}
       />
 
-      {/* Clicking the text opens the edit dialog */}
-      <button
-        type="button"
-        onClick={() => setEditOpen(true)}
-        className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-sm text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
-        <TaskSummary task={task} />
-      </button>
-
-      <EditTaskDialog task={task} open={editOpen} onOpenChange={setEditOpen} />
+      {readOnly ? (
+        // View-only: just the details, nothing to click
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <TaskSummary task={task} />
+        </div>
+      ) : (
+        <>
+          {/* Clicking the text opens the edit dialog */}
+          <button
+            type="button"
+            onClick={() => setEditOpen(true)}
+            className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-sm text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <TaskSummary task={task} />
+          </button>
+          <EditTaskDialog task={task} open={editOpen} onOpenChange={setEditOpen} />
+        </>
+      )}
     </article>
   );
 }
