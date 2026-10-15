@@ -31,9 +31,6 @@ so the browser sees one site and the httpOnly auth cookie works with `SameSite=L
 | `npm run format`    | Format all files with Prettier     |
 
 ## Project structure
-
-Feature-based, following [bulletproof-react](https://github.com/alan2207/bulletproof-react):
-
 ```
 src/
 ├─ main.tsx              entry point
