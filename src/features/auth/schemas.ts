@@ -1,14 +1,8 @@
 import { z } from 'zod';
+import { emailRule } from '@/lib/validation';
 
 // The same rules as the backend (backend/src/modules/auth/auth.schema.ts), checked in the browser
 // first so mistakes show instantly. The backend still checks everything again: never trust the client.
-
-const emailRule = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .min(1, { error: 'Email is required', abort: true })
-  .pipe(z.email('Enter a valid email address'));
 
 // Exported: the reset password form (Step 4) uses the same rule
 export const passwordRule = z
