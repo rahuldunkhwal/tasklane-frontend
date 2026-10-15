@@ -1,24 +1,9 @@
-import { Link, useSearchParams } from 'react-router';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSearchParams } from 'react-router';
+import { ResetPasswordForm } from '@/features/auth/components/reset-password-form';
 
-// Placeholder: the real form arrives in Step 4.
-// The email link looks like /reset-password?token=abc..., so the token comes from the URL.
+// The email link looks like /reset-password?token=abc..., so the page reads the token from the URL
+// and hands it to the form (reading the URL is the page's job; the form just receives the token).
 export function ResetPasswordRoute() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Choose a new password</CardTitle>
-        <CardDescription>The reset form comes in Step 4.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2 text-sm">
-        <p className="break-all">Token from the link: {token ?? '(none)'}</p>
-        <Link to="/login" className="underline">
-          Back to log in
-        </Link>
-      </CardContent>
-    </Card>
-  );
+  return <ResetPasswordForm token={searchParams.get('token')} />;
 }

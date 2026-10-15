@@ -19,6 +19,12 @@ export const passwordRule = z
   .regex(/[A-Za-z]/, 'Password must contain at least one letter')
   .regex(/[0-9]/, 'Password must contain at least one number');
 
+// Shared by signup and reset: the second password box must match the first.
+// Only the frontend checks this (it catches typing mistakes); the API never receives confirmPassword.
+const passwordsMatch = (values: { password: string; confirmPassword: string }) =>
+  values.password === values.confirmPassword;
+const passwordsMismatch = { message: 'Passwords do not match', path: ['confirmPassword'] };
+
 export const loginSchema = z.object({
   email: emailRule,
   password: z.string().min(1, 'Password is required'), // no strength rules when logging in
@@ -35,11 +41,21 @@ export const signupSchema = z
     password: passwordRule,
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
-  // Only the frontend checks this (it catches typing mistakes); the API never receives confirmPassword
-  .refine((values) => values.password === values.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'], // show the message under the confirm field
-  });
+  .refine(passwordsMatch, passwordsMismatch);
+
+export const forgotPasswordSchema = z.object({
+  email: emailRule,
+});
+
+// The reset token is not a form field: it comes from the link (?token=...)
+export const resetPasswordSchema = z
+  .object({
+    password: passwordRule,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine(passwordsMatch, passwordsMismatch);
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type SignupInput = z.infer<typeof signupSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
