@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { FormErrorAlert } from '@/components/form-error-alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,9 +17,12 @@ import { Spinner } from '@/components/ui/spinner';
 import { getApiError, getErrorMessage } from '@/lib/api-client';
 import { useSignup } from '../api/signup';
 import { signupSchema, type SignupInput } from '../schemas';
+import { PasswordInput } from './password-input';
 
 export function SignupForm() {
   const signup = useSignup();
+  const location = useLocation();
+  const [params] = useSearchParams();
   const {
     register,
     handleSubmit,
@@ -27,7 +30,8 @@ export function SignupForm() {
     formState: { errors },
   } = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+    // Pre-fill the email when arriving from an invite link (?email=...)
+    defaultValues: { name: '', email: params.get('email') ?? '', password: '', confirmPassword: '' },
   });
 
   const onSubmit = handleSubmit((values) =>
@@ -85,9 +89,8 @@ export function SignupForm() {
 
             <Field data-invalid={!!errors.password}>
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Create a password"
                 autoComplete="new-password"
                 aria-invalid={!!errors.password}
@@ -105,9 +108,8 @@ export function SignupForm() {
 
             <Field data-invalid={!!errors.confirmPassword}>
               <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 placeholder="Type the password again"
                 autoComplete="new-password"
                 aria-invalid={!!errors.confirmPassword}
@@ -126,7 +128,8 @@ export function SignupForm() {
 
       <CardFooter className="justify-center gap-1 text-sm">
         Already have an account?
-        <Link to="/login" className="font-medium underline underline-offset-4">
+        {/* Keep the invite's email/redirect params when switching to log in */}
+        <Link to={`/login${location.search}`} className="font-medium underline underline-offset-4">
           Log in
         </Link>
       </CardFooter>

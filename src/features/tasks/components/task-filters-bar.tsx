@@ -55,79 +55,69 @@ export function TaskFiltersBar() {
     clearFilters();
   };
 
+  const pillTrigger = 'h-10 rounded-full bg-surface';
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            value={searchText}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search tasks by title…"
-            aria-label="Search tasks by title"
-            maxLength={100}
-            className="bg-background pl-8"
-          />
-        </div>
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="relative flex-1 sm:flex-none">
+        <SearchIcon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        {filtering && tasks.isFetching && (
+          <Spinner className="absolute top-1/2 right-3.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+        )}
+        <Input
+          type="search"
+          value={searchText}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder="Search tasks…"
+          aria-label="Search tasks by title"
+          maxLength={100}
+          className="bg-surface pl-10 sm:w-[250px]"
+        />
+      </div>
 
-        <div className="flex gap-2">
-          <Select
-            value={filters.priority || ALL}
-            onValueChange={(value) =>
-              setFilters({ priority: value === ALL ? '' : (value as typeof filters.priority) })
-            }
-          >
-            <SelectTrigger aria-label="Filter by priority" className="w-full bg-background sm:w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>All priorities</SelectItem>
-              {(['high', 'medium', 'low'] as const).map((priority) => (
-                <SelectItem key={priority} value={priority}>
-                  {PRIORITY_LABELS[priority]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="flex gap-2">
+        <Select
+          value={filters.priority || ALL}
+          onValueChange={(value) =>
+            setFilters({ priority: value === ALL ? '' : (value as typeof filters.priority) })
+          }
+        >
+          <SelectTrigger aria-label="Filter by priority" className={`${pillTrigger} w-full sm:w-36`}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL}>All priorities</SelectItem>
+            {(['high', 'medium', 'low'] as const).map((priority) => (
+              <SelectItem key={priority} value={priority}>
+                {PRIORITY_LABELS[priority]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <Select
-            value={filters.due || ANY}
-            onValueChange={(value) =>
-              setFilters({ due: value === ANY ? '' : (value as DueFilter) })
-            }
-          >
-            <SelectTrigger aria-label="Filter by due date" className="w-full bg-background sm:w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ANY}>Any due date</SelectItem>
-              {(Object.keys(DUE_LABELS) as DueFilter[]).map((due) => (
-                <SelectItem key={due} value={due}>
-                  {DUE_LABELS[due]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          value={filters.due || ANY}
+          onValueChange={(value) => setFilters({ due: value === ANY ? '' : (value as DueFilter) })}
+        >
+          <SelectTrigger aria-label="Filter by due date" className={`${pillTrigger} w-full sm:w-36`}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ANY}>Any due date</SelectItem>
+            {(Object.keys(DUE_LABELS) as DueFilter[]).map((due) => (
+              <SelectItem key={due} value={due}>
+                {DUE_LABELS[due]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {(filtering || searchText) && (
-          <Button variant="ghost" onClick={onClear}>
+          <Button variant="ghost" size="icon" onClick={onClear} aria-label="Clear filters">
             <XIcon />
-            Clear filters
           </Button>
         )}
       </div>
-
-      {/* Result summary, only while filtering */}
-      {filtering && (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground" aria-live="polite">
-          {tasks.isFetching && <Spinner className="size-3" />}
-          {tasks.data &&
-            `${tasks.data.length} ${tasks.data.length === 1 ? 'task matches' : 'tasks match'}`}
-          <span>· Clear filters to drag tasks</span>
-        </p>
-      )}
     </div>
   );
 }

@@ -1,11 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { CalendarIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormErrorAlert } from '@/components/form-error-alert';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { DialogClose, DialogFooter } from '@/components/ui/dialog';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -17,7 +20,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { getErrorMessage } from '@/lib/api-client';
 import { taskFormSchema, type TaskFormValues } from '../schemas';
-import { PRIORITY_LABELS } from '../utils';
+import { dateToYmd, formatYmd, PRIORITY_LABELS, ymdToDate } from '../utils';
 
 const EMPTY_TASK: TaskFormValues = { title: '', description: '', priority: 'medium', dueDate: '' };
 const PRIORITIES = ['low', 'medium', 'high'] as const;
@@ -110,8 +113,58 @@ export function TaskForm({
 
           <Field>
             <FieldLabel htmlFor="task-due-date">Due date</FieldLabel>
-            {/* The browser's own date picker: works well on phones, no extra library */}
-            <Input id="task-due-date" type="date" min={minDueDate} {...register('dueDate')} />
+            {/* A calendar in a popover (shadcn). The form value stays a "YYYY-MM-DD" string,
+                so the submit/edit conversion is unchanged. */}
+            <Controller
+              control={control}
+              name="dueDate"
+              render={({ field }) => {
+                const selected = ymdToDate(field.value);
+                const earliest = minDueDate ? ymdToDate(minDueDate) : undefined;
+                return (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="task-due-date"
+                        type="button"
+                        variant="outline"
+                        className="w-full justify-between px-4 font-normal"
+                      >
+                        {field.value ? (
+                          formatYmd(field.value)
+                        ) : (
+                          <span className="text-muted-foreground">Pick a date</span>
+                        )}
+                        <CalendarIcon className="size-4 opacity-70" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={selected}
+                        defaultMonth={selected}
+                        onSelect={(date) => field.onChange(date ? dateToYmd(date) : '')}
+                        disabled={earliest ? { before: earliest } : undefined}
+                        autoFocus
+                      />
+                      {field.value && (
+                        <div className="border-t p-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => field.onChange('')}
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                      )}
+                    </PopoverContent>
+                  </Popover>
+                );
+              }}
+            />
             <FieldDescription>Optional</FieldDescription>
           </Field>
         </div>

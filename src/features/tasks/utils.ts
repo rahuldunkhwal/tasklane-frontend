@@ -37,6 +37,31 @@ export function toDateInputValue(iso: string | null): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+// "YYYY-MM-DD" <-> a local Date, for the calendar picker (built from parts so the day never
+// shifts across time zones, unlike new Date("YYYY-MM-DD") which is parsed as UTC).
+export function ymdToDate(ymd: string): Date | undefined {
+  if (!ymd) return undefined;
+  const [year, month, day] = ymd.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function dateToYmd(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// How a chosen date reads on the picker button, e.g. "16 Oct" (adds the year if it's not this one)
+export function formatYmd(ymd: string): string {
+  const date = ymdToDate(ymd);
+  if (!date) return '';
+  const sameYear = date.getFullYear() === new Date().getFullYear();
+  return date.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: sameYear ? undefined : 'numeric',
+  });
+}
+
 // Today as "YYYY-MM-DD", used as the date picker's minimum for NEW tasks (a hint, not a rule)
 export function todayInputValue() {
   return toDateInputValue(new Date().toISOString());

@@ -1,5 +1,6 @@
 import { PlusIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,10 +13,12 @@ import {
 import { useCreateBoard } from '../api/create-board';
 import { BoardTitleForm } from './board-title-form';
 
-// "New board" button + the dialog it opens
-export function CreateBoardDialog() {
+// The dialog for creating a board. By default it renders a "New board" button; pass `trigger`
+// to open it from something else (e.g. the "Create new board" tile on Home).
+export function CreateBoardDialog({ trigger }: { trigger?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const createBoard = useCreateBoard();
+  const navigate = useNavigate();
 
   // Closing the dialog also clears the last error, so it doesn't reappear next time
   const handleOpenChange = (next: boolean) => {
@@ -26,10 +29,12 @@ export function CreateBoardDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>
-          <PlusIcon />
-          New board
-        </Button>
+        {trigger ?? (
+          <Button>
+            <PlusIcon />
+            New board
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -42,7 +47,17 @@ export function CreateBoardDialog() {
           isPending={createBoard.isPending}
           error={createBoard.error}
           onSubmit={(title) =>
-            createBoard.mutate({ title }, { onSuccess: () => handleOpenChange(false) })
+            createBoard.mutate(
+              { title },
+              {
+                // Land on the Boards page so the new board is ready to add tasks to
+                // (a no-op when you're already there).
+                onSuccess: () => {
+                  handleOpenChange(false);
+                  navigate('/boards');
+                },
+              },
+            )
           }
         />
       </DialogContent>

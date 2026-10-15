@@ -1,14 +1,15 @@
 import { ChangePasswordForm } from '@/features/auth/components/change-password-form';
 
-// Profile combines the account settings. Updating the name and profile picture come next.
+// Profile holds account settings. Updating the name and photo come after we build that backend;
+// for now it's the change-password panel.
 export function ProfileRoute() {
   return (
-    <div className="flex max-w-xl flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
-        <p className="text-sm text-muted-foreground">Manage your account.</p>
+    <div className="mx-auto w-full max-w-[960px] px-4 pt-10 pb-10 sm:px-6">
+      <h1 className="text-[32px] leading-[38px] font-extrabold tracking-[-0.03em]">Profile</h1>
+      <p className="mt-1 text-sm text-ink-muted">Manage your account.</p>
+      <div className="mt-6 max-w-md">
+        <ChangePasswordForm />
       </div>
-      <ChangePasswordForm />
     </div>
   );
 }

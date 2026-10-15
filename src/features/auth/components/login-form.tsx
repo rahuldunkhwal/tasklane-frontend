@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { FormErrorAlert } from '@/components/form-error-alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,25 +17,29 @@ import { Spinner } from '@/components/ui/spinner';
 import { getErrorMessage } from '@/lib/api-client';
 import { useLogin } from '../api/login';
 import { loginSchema, type LoginInput } from '../schemas';
+import { PasswordInput } from './password-input';
 
 export function LoginForm() {
   const login = useLogin();
+  const location = useLocation();
+  const [params] = useSearchParams();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    // Pre-fill the email when arriving from an invite link (?email=...)
+    defaultValues: { email: params.get('email') ?? '', password: '' },
   });
 
   // handleSubmit checks the zod rules first: login.mutate only runs if every field is valid
   const onSubmit = handleSubmit((values) => login.mutate(values));
 
   return (
-    <Card>
+    <Card className="rounded-[28px]">
       <CardHeader>
-        <CardTitle>Log in</CardTitle>
+        <CardTitle className="text-[26px] font-bold">Welcome back</CardTitle>
         <CardDescription>Enter your email and password to continue.</CardDescription>
       </CardHeader>
 
@@ -53,6 +57,7 @@ export function LoginForm() {
                 type="email"
                 placeholder="you@example.com"
                 autoComplete="email"
+                autoFocus
                 aria-invalid={!!errors.email}
                 {...register('email')}
               />
@@ -69,9 +74,8 @@ export function LoginForm() {
                   Forgot password?
                 </Link>
               </div>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 aria-invalid={!!errors.password}
@@ -91,7 +95,8 @@ export function LoginForm() {
 
       <CardFooter className="justify-center gap-1 text-sm">
         No account?
-        <Link to="/signup" className="font-medium underline underline-offset-4">
+        {/* Keep the invite's email/redirect params when switching to sign up */}
+        <Link to={`/signup${location.search}`} className="font-medium underline underline-offset-4">
           Sign up
         </Link>
       </CardFooter>

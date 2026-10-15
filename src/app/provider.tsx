@@ -14,8 +14,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {/* Where toast messages appear (e.g. "Couldn't update the task"); richColors = red for errors */}
-      <Toaster richColors />
+      {/* Toast messages (e.g. "Password changed", "Couldn't update the task").
+          richColors = red for errors; success uses the lime palette via the tokens below. */}
+      <Toaster
+        richColors
+        position="bottom-right"
+        toastOptions={{
+          classNames: {
+            toast: 'rounded-full! font-semibold!',
+            success: 'bg-success-tint! text-success! border-success-tint!',
+          },
+        }}
+      />
     </QueryClientProvider>
   );
 }

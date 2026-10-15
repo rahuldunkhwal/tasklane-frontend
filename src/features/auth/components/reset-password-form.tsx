@@ -13,11 +13,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { getApiError, getErrorMessage } from '@/lib/api-client';
 import { useResetPassword } from '../api/reset-password';
 import { resetPasswordSchema, type ResetPasswordInput } from '../schemas';
+import { PasswordInput } from './password-input';
 
 // token comes from the email link (/reset-password?token=...); null if the link has no token
 export function ResetPasswordForm({ token }: { token: string | null }) {
@@ -79,9 +79,8 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
 
             <Field data-invalid={!!errors.password}>
               <FieldLabel htmlFor="password">New password</FieldLabel>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Create a new password"
                 autoComplete="new-password"
                 aria-invalid={!!errors.password}
@@ -98,9 +97,8 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
 
             <Field data-invalid={!!errors.confirmPassword}>
               <FieldLabel htmlFor="confirmPassword">Confirm new password</FieldLabel>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 placeholder="Type the password again"
                 autoComplete="new-password"
                 aria-invalid={!!errors.confirmPassword}

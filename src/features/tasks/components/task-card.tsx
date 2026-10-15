@@ -50,7 +50,8 @@ export function TaskCard({ task, dragDisabled = false, readOnly = false }: TaskC
       style={{ transform: CSS.Translate.toString(transform), transition }}
       // The card being dragged stays as a faded placeholder; a floating copy follows the pointer
       className={cn(
-        'flex gap-2 rounded-lg border bg-background p-3 shadow-xs',
+        'group/card flex gap-2 rounded-[16px] border bg-surface p-3 shadow-(--shadow-card) transition-colors',
+        !noDrag && 'hover:border-border-strong',
         isDragging && 'opacity-40',
       )}
     >
@@ -64,14 +65,14 @@ export function TaskCard({ task, dragDisabled = false, readOnly = false }: TaskC
           {...attributes}
           {...listeners}
           aria-label={`Move "${task.title}"`}
-          className="-ml-1 flex h-5 cursor-grab touch-none items-center rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing"
+          className="-ml-1 flex h-5 cursor-grab touch-none items-center rounded-sm text-muted-foreground opacity-0 transition-opacity outline-none group-hover/card:opacity-100 hover:text-foreground focus-visible:opacity-100 focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing [@media(hover:none)]:opacity-100"
         >
           <GripVerticalIcon className="size-4" />
         </button>
       )}
 
       <Checkbox
-        className="mt-0.5"
+        className="mt-0.5 size-[18px] rounded-[6px] border-2"
         checked={task.completed}
         disabled={readOnly} // view-only: shows done / not done, but can't be changed
         onCheckedChange={(checked) => toggleCompleted(checked === true)}
@@ -103,7 +104,7 @@ export function TaskCard({ task, dragDisabled = false, readOnly = false }: TaskC
 // The floating copy that follows the pointer while dragging (looks the same, does nothing)
 export function TaskCardPreview({ task }: { task: Task }) {
   return (
-    <div className="flex cursor-grabbing gap-2 rounded-lg border bg-background p-3 shadow-lg">
+    <div className="flex rotate-2 cursor-grabbing gap-2 rounded-lg border border-brand-line bg-surface p-3 shadow-(--shadow-lift)">
       <GripVerticalIcon className="-ml-1 size-4 text-muted-foreground" />
       <Checkbox className="mt-0.5" checked={task.completed} tabIndex={-1} aria-hidden />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">

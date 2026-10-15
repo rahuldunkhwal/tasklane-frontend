@@ -123,8 +123,12 @@ export function TaskDragAndDrop({ children }: { children: ReactNode }) {
       onDragCancel={handleDragCancel}
     >
       {children}
-      {/* The floating copy that follows the pointer (drawn above everything else) */}
-      <DragOverlay>{activeTask ? <TaskCardPreview task={activeTask} /> : null}</DragOverlay>
+      {/* The floating copy that follows the pointer (drawn above everything else).
+          dropAnimation={null}: the card snaps to its final spot on release instead of
+          playing a ~200ms settle animation, so a drop feels instant. */}
+      <DragOverlay dropAnimation={null}>
+        {activeTask ? <TaskCardPreview task={activeTask} /> : null}
+      </DragOverlay>
     </DndContext>
   );
 }

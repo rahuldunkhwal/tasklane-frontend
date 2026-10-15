@@ -1,15 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { CheckIcon, CircleIcon } from 'lucide-react';
+import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
 import { toast } from 'sonner';
 import { FormErrorAlert } from '@/components/form-error-alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
 import { getApiError, getErrorMessage } from '@/lib/api-client';
+import { cn } from '@/lib/utils';
 import { useChangePassword } from '../api/change-password';
 import { changePasswordSchema, type ChangePasswordInput } from '../schemas';
+import { PasswordInput } from './password-input';
 
 const EMPTY = { currentPassword: '', newPassword: '', confirmPassword: '' };
 
@@ -20,11 +19,21 @@ export function ChangePasswordForm() {
     handleSubmit,
     reset,
     setError,
-    formState: { errors },
+    control,
+    formState: { errors, isValid },
   } = useForm<ChangePasswordInput>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: EMPTY,
+    mode: 'onChange', // so the live checklist and the enabled/disabled button update as you type
   });
+
+  // useWatch (not watch()) subscribes cleanly and plays well with the React Compiler
+  const newPassword = useWatch({ control, name: 'newPassword' }) ?? '';
+  const rules = [
+    { label: 'At least 8 characters', ok: newPassword.length >= 8 },
+    { label: 'Contains a letter', ok: /[A-Za-z]/.test(newPassword) },
+    { label: 'Contains a number', ok: /[0-9]/.test(newPassword) },
+  ];
 
   const onSubmit = handleSubmit((values) =>
     changePassword.mutate(values, {
@@ -45,74 +54,98 @@ export function ChangePasswordForm() {
   const wrongCurrent = getApiError(changePassword.error)?.code === 'INVALID_CURRENT_PASSWORD';
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Change password</CardTitle>
-        <CardDescription>
-          You'll stay logged in here; your other devices will be logged out.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} noValidate>
-          <FieldGroup>
-            {changePassword.isError && !wrongCurrent && (
-              <FormErrorAlert message={getErrorMessage(changePassword.error)} />
-            )}
+    <section className="rounded-[28px] border bg-surface p-7 shadow-(--shadow-card)">
+      <h2 className="text-xl font-bold">Change password</h2>
+      <p className="mt-1 text-[13px] text-ink-muted">
+        You'll stay logged in here; your other devices will be logged out.
+      </p>
 
-            <Field data-invalid={!!errors.currentPassword}>
-              <FieldLabel htmlFor="current-password">Current password</FieldLabel>
-              <Input
-                id="current-password"
-                type="password"
-                placeholder="Enter your current password"
-                autoComplete="current-password"
-                aria-invalid={!!errors.currentPassword}
-                {...register('currentPassword')}
-              />
-              <FieldError errors={[errors.currentPassword]} />
-            </Field>
+      <form onSubmit={onSubmit} noValidate className="mt-5 flex flex-col gap-4">
+        {changePassword.isError && !wrongCurrent && (
+          <FormErrorAlert message={getErrorMessage(changePassword.error)} />
+        )}
 
-            <Field data-invalid={!!errors.newPassword}>
-              <FieldLabel htmlFor="new-password">New password</FieldLabel>
-              <Input
-                id="new-password"
-                type="password"
-                placeholder="Create a new password"
-                autoComplete="new-password"
-                aria-invalid={!!errors.newPassword}
-                {...register('newPassword')}
-              />
-              {errors.newPassword ? (
-                <FieldError errors={[errors.newPassword]} />
-              ) : (
-                <FieldDescription>
-                  At least 8 characters, with a letter and a number.
-                </FieldDescription>
-              )}
-            </Field>
+        <PasswordField
+          id="current-password"
+          label="Current password"
+          placeholder="Enter your current password"
+          autoComplete="current-password"
+          error={errors.currentPassword?.message}
+          field={register('currentPassword')}
+        />
 
-            <Field data-invalid={!!errors.confirmPassword}>
-              <FieldLabel htmlFor="confirm-new-password">Confirm new password</FieldLabel>
-              <Input
-                id="confirm-new-password"
-                type="password"
-                placeholder="Type the new password again"
-                autoComplete="new-password"
-                aria-invalid={!!errors.confirmPassword}
-                {...register('confirmPassword')}
-              />
-              <FieldError errors={[errors.confirmPassword]} />
-            </Field>
+        <div className="flex flex-col gap-2">
+          <PasswordField
+            id="new-password"
+            label="New password"
+            placeholder="Create a new password"
+            autoComplete="new-password"
+            error={errors.newPassword?.message}
+            field={register('newPassword')}
+          />
+          <ul className="flex flex-col gap-1 text-xs font-medium">
+            {rules.map((rule) => (
+              <li
+                key={rule.label}
+                className={cn('flex items-center gap-1.5', rule.ok ? 'text-success' : 'text-ink-muted')}
+              >
+                {rule.ok ? <CheckIcon className="size-3.5" /> : <CircleIcon className="size-3.5" />}
+                {rule.label}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-            <div>
-              <Button type="submit" disabled={changePassword.isPending}>
-                {changePassword.isPending && <Spinner />}
-                {changePassword.isPending ? 'Changing…' : 'Change password'}
-              </Button>
-            </div>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+        <PasswordField
+          id="confirm-new-password"
+          label="Confirm new password"
+          placeholder="Type the new password again"
+          autoComplete="new-password"
+          error={errors.confirmPassword?.message}
+          field={register('confirmPassword')}
+        />
+
+        <div>
+          <Button
+            type="submit"
+            disabled={!isValid || changePassword.isPending}
+            className={cn(!isValid && 'bg-sunken text-ink-muted hover:bg-sunken')}
+          >
+            {changePassword.isPending ? 'Changing…' : 'Change password'}
+          </Button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+type PasswordFieldProps = {
+  id: string;
+  label: string;
+  placeholder: string;
+  autoComplete: string;
+  error?: string;
+  field: UseFormRegisterReturn;
+};
+
+function PasswordField({ id, label, placeholder, autoComplete, error, field }: PasswordFieldProps) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-sm font-semibold">
+        {label}
+      </label>
+      <PasswordInput
+        id={id}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        aria-invalid={!!error}
+        {...field}
+      />
+      {error && (
+        <p className="text-xs text-danger" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

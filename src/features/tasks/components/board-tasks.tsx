@@ -47,7 +47,7 @@ export function BoardTasks({ board }: { board: Board }) {
   const boardTasks = tasks.data.filter((task) => task.boardId === board.id);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex min-h-0 flex-1 flex-col gap-1">
       {/* SortableContext: these cards can be reordered, and dnd-kit animates the others out of the way */}
       <SortableContext
         id={board.id}
@@ -57,12 +57,13 @@ export function BoardTasks({ board }: { board: Board }) {
         <ul
           ref={setNodeRef}
           className={cn(
-            'flex min-h-16 flex-col gap-2 rounded-lg transition-colors',
-            isOver && 'bg-muted/60', // light highlight while a task hovers over this column
+            'flex min-h-16 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl p-0.5 transition-colors [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-ink/20 [&::-webkit-scrollbar]:w-1.5',
+            // Lime dashed drop target while a task hovers over this column
+            isOver && 'bg-brand-tint outline-2 outline-dashed outline-brand-line',
           )}
         >
           {boardTasks.length === 0 ? (
-            <li className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
+            <li className="rounded-xl border border-dashed border-border-strong/50 p-4 text-center text-sm text-ink-muted">
               {filtering ? 'No matching tasks' : 'No tasks yet'}
             </li>
           ) : (
@@ -76,7 +77,11 @@ export function BoardTasks({ board }: { board: Board }) {
           )}
         </ul>
       </SortableContext>
-      {!readOnly && <AddTaskDialog board={board} />}
+      {!readOnly && (
+        <div className="shrink-0 px-1 pt-1">
+          <AddTaskDialog board={board} />
+        </div>
+      )}
     </div>
   );
 }

@@ -7,7 +7,9 @@ import { ForgotPasswordRoute } from '@/app/routes/auth/forgot-password';
 import { LoginRoute } from '@/app/routes/auth/login';
 import { ResetPasswordRoute } from '@/app/routes/auth/reset-password';
 import { SignupRoute } from '@/app/routes/auth/signup';
-import { HomeRoute } from '@/app/routes/home';
+import { BoardsRoute } from '@/app/routes/boards';
+import { DashboardRoute } from '@/app/routes/dashboard';
+import { InviteRoute } from '@/app/routes/invite';
 import { NotFoundRoute } from '@/app/routes/not-found';
 import { ProfileRoute } from '@/app/routes/profile';
 
@@ -42,12 +44,17 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { path: '/', element: <HomeRoute /> },
+          // Landing: the overview ("Home" tab). Boards (the lanes) is its own section.
+          { path: '/', element: <DashboardRoute /> },
+          { path: '/boards', element: <BoardsRoute /> },
           { path: '/profile', element: <ProfileRoute /> },
         ],
       },
     ],
   },
+
+  // Invite links are open to everyone (logged in or not): the page itself decides what to show
+  { path: '/invite/:token', element: <InviteRoute /> },
 
   // Any other URL
   { path: '*', element: <NotFoundRoute /> },
