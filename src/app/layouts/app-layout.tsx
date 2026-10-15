@@ -8,9 +8,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { TasklaneLogo } from '@/components/tasklane-logo';
+import { UserAvatar } from '@/components/user-avatar';
 import { useLogout } from '@/features/auth/api/logout';
 import { useMe } from '@/features/auth/api/get-me';
-import { initialsOf } from '@/lib/initials';
 
 // Shared container so the navbar and the page content line up on the same 1280px grid.
 export const appContainer = 'mx-auto w-full max-w-[1280px] px-4 sm:px-6';
@@ -53,12 +53,7 @@ export function AppLayout() {
                 className="flex items-center gap-2 rounded-full border bg-surface py-1 pr-2.5 pl-1 outline-none transition-colors hover:bg-sunken focus-visible:ring-3 focus-visible:ring-ring/50"
                 aria-label="Account menu"
               >
-                <span
-                  className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-tint text-sm font-bold text-brand-strong"
-                  aria-hidden
-                >
-                  {initialsOf(user?.name)}
-                </span>
+                <UserAvatar name={user?.name} avatarUrl={user?.avatarUrl} className="size-8 text-sm" />
                 <span className="hidden text-[13px] font-semibold sm:inline">
                   {user?.name?.split(' ')[0]}
                 </span>

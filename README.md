@@ -1,6 +1,6 @@
-# Task Board (frontend)
+# Tasklane (frontend)
 
-React app for the Task Board: Vite, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, React Router.
+React app for Tasklane: Vite, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, React Router.
 
 > The API lives in a separate repository (`backend`). This README grows with each phase.
 

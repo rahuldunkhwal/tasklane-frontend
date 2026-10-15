@@ -12,7 +12,7 @@ import { PasswordInput } from './password-input';
 
 const EMPTY = { currentPassword: '', newPassword: '', confirmPassword: '' };
 
-export function ChangePasswordForm() {
+export function ChangePasswordForm({ onSuccess }: { onSuccess?: () => void }) {
   const changePassword = useChangePassword();
   const {
     register,
@@ -40,6 +40,7 @@ export function ChangePasswordForm() {
       onSuccess: (message) => {
         reset(EMPTY); // never leave passwords sitting in the form
         toast.success('Password changed', { description: message });
+        onSuccess?.(); // e.g. close the dialog
       },
       onError: (error) => {
         // A wrong current password belongs under that field, not in the red box
@@ -54,16 +55,10 @@ export function ChangePasswordForm() {
   const wrongCurrent = getApiError(changePassword.error)?.code === 'INVALID_CURRENT_PASSWORD';
 
   return (
-    <section className="rounded-[28px] border bg-surface p-7 shadow-(--shadow-card)">
-      <h2 className="text-xl font-bold">Change password</h2>
-      <p className="mt-1 text-[13px] text-ink-muted">
-        You'll stay logged in here; your other devices will be logged out.
-      </p>
-
-      <form onSubmit={onSubmit} noValidate className="mt-5 flex flex-col gap-4">
-        {changePassword.isError && !wrongCurrent && (
-          <FormErrorAlert message={getErrorMessage(changePassword.error)} />
-        )}
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+      {changePassword.isError && !wrongCurrent && (
+        <FormErrorAlert message={getErrorMessage(changePassword.error)} />
+      )}
 
         <PasswordField
           id="current-password"
@@ -81,7 +76,9 @@ export function ChangePasswordForm() {
             placeholder="Create a new password"
             autoComplete="new-password"
             error={errors.newPassword?.message}
-            field={register('newPassword')}
+            // deps: re-check the "passwords match" rule on Confirm whenever New changes,
+            // so fixing a mismatch by editing New clears the stale error on Confirm.
+            field={register('newPassword', { deps: ['confirmPassword'] })}
           />
           <ul className="flex flex-col gap-1 text-xs font-medium">
             {rules.map((rule) => (
@@ -105,17 +102,16 @@ export function ChangePasswordForm() {
           field={register('confirmPassword')}
         />
 
-        <div>
-          <Button
-            type="submit"
-            disabled={!isValid || changePassword.isPending}
-            className={cn(!isValid && 'bg-sunken text-ink-muted hover:bg-sunken')}
-          >
-            {changePassword.isPending ? 'Changing…' : 'Change password'}
-          </Button>
-        </div>
-      </form>
-    </section>
+      <div>
+        <Button
+          type="submit"
+          disabled={!isValid || changePassword.isPending}
+          className={cn(!isValid && 'bg-sunken text-ink-muted hover:bg-sunken')}
+        >
+          {changePassword.isPending ? 'Changing…' : 'Change password'}
+        </Button>
+      </div>
+    </form>
   );
 }
 

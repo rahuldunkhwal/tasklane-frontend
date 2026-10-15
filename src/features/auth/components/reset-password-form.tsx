@@ -84,7 +84,7 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
                 placeholder="Create a new password"
                 autoComplete="new-password"
                 aria-invalid={!!errors.password}
-                {...register('password')}
+                {...register('password', { deps: ['confirmPassword'] })}
               />
               {errors.password ? (
                 <FieldError errors={[errors.password]} />

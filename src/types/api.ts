@@ -8,6 +8,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
+  avatarUrl: string | null; // Cloudinary URL, or null when the user has no photo
   createdAt: string; // dates arrive as text in JSON, e.g. "2026-10-15T10:21:22.036Z"
 };
 

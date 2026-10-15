@@ -94,7 +94,7 @@ export function SignupForm() {
                 placeholder="Create a password"
                 autoComplete="new-password"
                 aria-invalid={!!errors.password}
-                {...register('password')}
+                {...register('password', { deps: ['confirmPassword'] })}
               />
               {/* Show the rules up front; once there's an error, show the error instead */}
               {errors.password ? (
