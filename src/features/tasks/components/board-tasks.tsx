@@ -63,8 +63,10 @@ export function BoardTasks({ board }: { board: Board }) {
           )}
         >
           {boardTasks.length === 0 ? (
+            // While filtering, boards with no matches aren't shown at all (see BoardsWorkspace),
+            // so an empty lane here always means the board really has no tasks
             <li className="rounded-xl border border-dashed border-border-strong/50 p-4 text-center text-sm text-ink-muted">
-              {filtering ? 'No matching tasks' : 'No tasks yet'}
+              No tasks yet
             </li>
           ) : (
             boardTasks.map((task) => (

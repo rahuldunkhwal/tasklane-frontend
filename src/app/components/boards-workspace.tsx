@@ -1,4 +1,4 @@
-import { LayoutGridIcon } from 'lucide-react';
+import { LayoutGridIcon, SearchXIcon } from 'lucide-react';
 import { appContainer } from '@/app/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,11 +14,18 @@ import { getErrorMessage } from '@/lib/api-client';
 // feature (lanes) with the tasks feature (task counts + lane contents).
 export function BoardsWorkspace() {
   const boards = useBoards();
-  const { filters } = useTaskFilters();
+  const { filters, filtering, clearFilters } = useTaskFilters();
   const tasks = useTasks(filters); // same key as the lanes → one shared request
 
   const countOf = (boardId: string) =>
     tasks.data ? tasks.data.filter((task) => task.boardId === boardId).length : undefined;
+
+  // While searching/filtering, only boards that have a matching task are shown, so the results
+  // come first instead of being buried after lanes full of "No matching tasks".
+  const visibleBoards =
+    filtering && tasks.data && boards.data
+      ? boards.data.filter((board) => (countOf(board.id) ?? 0) > 0)
+      : (boards.data ?? []);
 
   if (boards.isPending) {
     return (
@@ -58,6 +65,21 @@ export function BoardsWorkspace() {
     );
   }
 
+  if (filtering && tasks.data && visibleBoards.length === 0) {
+    return (
+      <div className={`${appContainer} pt-6`}>
+        <div className="flex flex-col items-center gap-2 rounded-[28px] border border-dashed bg-surface p-10 text-center">
+          <SearchXIcon className="size-8 text-ink-muted" />
+          <p className="font-semibold">No tasks match your filters</p>
+          <p className="mb-2 text-sm text-ink-muted">Try a different search, or clear the filters.</p>
+          <Button variant="outline" onClick={clearFilters}>
+            Clear filters
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative mt-6 min-h-0 flex-1">
       {/* Full-width, scrolls sideways; the first lane lines up with the page container */}
@@ -68,7 +90,7 @@ export function BoardsWorkspace() {
           paddingRight: '1.5rem',
         }}
       >
-        {boards.data.map((board) => (
+        {visibleBoards.map((board) => (
           <BoardColumn key={board.id} board={board} count={countOf(board.id)}>
             <BoardTasks board={board} />
           </BoardColumn>
