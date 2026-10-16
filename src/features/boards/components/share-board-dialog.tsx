@@ -20,7 +20,7 @@ import { useShares } from '../api/get-shares';
 import { useRemoveInvite } from '../api/remove-invite';
 import { useSendInvite } from '../api/send-invite';
 import { useUnshareBoard } from '../api/unshare-board';
-import { shareBoardSchema, type ShareBoardInput } from '../schemas';
+import { inviteSchema, type InviteInput } from '../schemas';
 
 type ShareBoardDialogProps = {
   board: Board;
@@ -41,8 +41,8 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ShareBoardInput>({
-    resolver: zodResolver(shareBoardSchema),
+  } = useForm<InviteInput>({
+    resolver: zodResolver(inviteSchema),
     defaultValues: { email: '' },
   });
 
@@ -82,8 +82,7 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
           </DialogDescription>
         </DialogHeader>
 
-        {/* Invite by email: instant access for an existing account, otherwise an emailed invite
-            that only that address can use */}
+        {/* Invite by email: a pending invite only that address can use; access once they accept */}
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
           {sendInvite.isError && <FormErrorAlert message={getErrorMessage(sendInvite.error)} />}
           <Field data-invalid={!!errors.email}>
@@ -162,7 +161,9 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
                 <li key={invite.email} className="flex items-center justify-between gap-3 p-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{invite.email}</p>
-                    <p className="text-xs text-muted-foreground">Invited · waiting for them to accept</p>
+                    <p className="text-xs text-muted-foreground">
+                      Invited · waiting for them to accept
+                    </p>
                   </div>
                   <Button
                     size="sm"

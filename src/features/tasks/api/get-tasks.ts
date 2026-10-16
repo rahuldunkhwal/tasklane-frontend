@@ -1,7 +1,13 @@
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import type { Task } from '@/types/api';
-import { isFiltering, matchesFilters, NO_FILTERS, toQueryParams, type TaskFilters } from '../filters';
+import {
+  isFiltering,
+  matchesFilters,
+  NO_FILTERS,
+  toQueryParams,
+  type TaskFilters,
+} from '../filters';
 
 // ['tasks'] = the full list (drag & drop works on this one).
 // ['tasks', filters] = a filtered list, cached separately per combination of filters.

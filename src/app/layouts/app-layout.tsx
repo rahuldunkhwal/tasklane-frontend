@@ -1,4 +1,10 @@
-import { ChevronDownIcon, LayoutDashboardIcon, LayoutGridIcon, LogOutIcon, UserIcon } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  LayoutDashboardIcon,
+  LayoutGridIcon,
+  LogOutIcon,
+  UserIcon,
+} from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router';
 import {
   DropdownMenu,
@@ -30,7 +36,9 @@ export function AppLayout() {
 
   const tabClass = ({ isActive }: { isActive: boolean }) =>
     `rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
-      isActive ? 'bg-brand-tint text-brand-strong' : 'text-ink-muted hover:bg-sunken hover:text-foreground'
+      isActive
+        ? 'bg-brand-tint text-brand-strong'
+        : 'text-ink-muted hover:bg-sunken hover:text-foreground'
     }`;
 
   return (
@@ -56,7 +64,11 @@ export function AppLayout() {
                 className="flex items-center gap-2 rounded-full border bg-surface py-1 pr-2.5 pl-1 outline-none transition-colors hover:bg-sunken focus-visible:ring-3 focus-visible:ring-ring/50"
                 aria-label="Account menu"
               >
-                <UserAvatar name={user?.name} avatarUrl={user?.avatarUrl} className="size-8 text-sm" />
+                <UserAvatar
+                  name={user?.name}
+                  avatarUrl={user?.avatarUrl}
+                  className="size-8 text-sm"
+                />
                 <span className="hidden text-[13px] font-semibold sm:inline">
                   {user?.name?.split(' ')[0]}
                 </span>

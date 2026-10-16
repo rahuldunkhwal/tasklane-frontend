@@ -22,7 +22,13 @@ type AvatarCropDialogProps = {
 };
 
 // Lets the user drag + zoom to frame a square before uploading, instead of uploading the raw file.
-export function AvatarCropDialog({ src, open, onOpenChange, onCropped, isUploading }: AvatarCropDialogProps) {
+export function AvatarCropDialog({
+  src,
+  open,
+  onOpenChange,
+  onCropped,
+  isUploading,
+}: AvatarCropDialogProps) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [areaPixels, setAreaPixels] = useState<Area | null>(null);

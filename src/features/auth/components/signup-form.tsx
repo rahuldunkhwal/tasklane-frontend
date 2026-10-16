@@ -31,7 +31,12 @@ export function SignupForm() {
   } = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
     // Pre-fill the email when arriving from an invite link (?email=...)
-    defaultValues: { name: '', email: params.get('email') ?? '', password: '', confirmPassword: '' },
+    defaultValues: {
+      name: '',
+      email: params.get('email') ?? '',
+      password: '',
+      confirmPassword: '',
+    },
   });
 
   const onSubmit = handleSubmit((values) =>

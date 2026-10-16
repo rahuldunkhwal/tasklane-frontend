@@ -29,7 +29,11 @@ export function BoardsWorkspace() {
 
   if (boards.isPending) {
     return (
-      <div className={`${appContainer} flex gap-4 pt-4`} aria-busy="true" aria-label="Loading boards">
+      <div
+        className={`${appContainer} flex gap-4 pt-4`}
+        aria-busy="true"
+        aria-label="Loading boards"
+      >
         {[1, 2, 3].map((n) => (
           <Skeleton key={n} className="h-64 w-72 shrink-0 rounded-[28px]" />
         ))}
@@ -71,7 +75,9 @@ export function BoardsWorkspace() {
         <div className="flex flex-col items-center gap-2 rounded-[28px] border border-dashed bg-surface p-10 text-center">
           <SearchXIcon className="size-8 text-ink-muted" />
           <p className="font-semibold">No tasks match your filters</p>
-          <p className="mb-2 text-sm text-ink-muted">Try a different search, or clear the filters.</p>
+          <p className="mb-2 text-sm text-ink-muted">
+            Try a different search, or clear the filters.
+          </p>
           <Button variant="outline" onClick={clearFilters}>
             Clear filters
           </Button>

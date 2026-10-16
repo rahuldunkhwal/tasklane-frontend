@@ -4,7 +4,7 @@ import { emailRule } from '@/lib/validation';
 // The same rules as the backend (backend/src/modules/auth/auth.schema.ts), checked in the browser
 // first so mistakes show instantly. The backend still checks everything again: never trust the client.
 
-// Exported: the reset password form (Step 4) uses the same rule
+// Exported: the reset password and change password forms use the same rule
 export const passwordRule = z
   .string()
   .min(1, { error: 'Password is required', abort: true })

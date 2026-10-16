@@ -12,5 +12,5 @@ export const boardTitleSchema = z.object({
 
 export type BoardTitleInput = z.infer<typeof boardTitleSchema>;
 
-export const shareBoardSchema = z.object({ email: emailRule });
-export type ShareBoardInput = z.infer<typeof shareBoardSchema>;
+export const inviteSchema = z.object({ email: emailRule });
+export type InviteInput = z.infer<typeof inviteSchema>;

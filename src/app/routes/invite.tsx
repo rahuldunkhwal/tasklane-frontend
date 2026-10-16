@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { TasklaneLogo } from '@/components/tasklane-logo';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -12,16 +12,14 @@ import { initialsOf } from '@/lib/initials';
 // Public landing page for an invite link: /invite/<token>?email=<invited>
 export function InviteRoute() {
   const { token = '' } = useParams();
-  const [params] = useSearchParams();
   const info = useInviteInfo(token);
   const me = useMe();
   const accept = useAcceptInvite();
   const logout = useLogout();
   const navigate = useNavigate();
 
-  // An emailed invite is bound to one address (the server says which one). The board-wide link
-  // isn't, but may still carry ?email= to pre-fill the sign-up form.
-  const invitedEmail = info.data?.invitedEmail ?? params.get('email') ?? '';
+  // The invite is bound to one address (the server says which); it also pre-fills the sign-up form
+  const invitedEmail = info.data?.invitedEmail ?? '';
   // Logged in with a different account than the invite was sent to: joining would be refused,
   // so say so up front and offer to switch accounts instead of showing a dead "Join" button.
   const wrongAccount = Boolean(
@@ -72,8 +70,8 @@ export function InviteRoute() {
               wrongAccount ? (
                 <div className="mt-6 flex flex-col gap-2">
                   <p className="text-sm text-danger" role="alert">
-                    You're logged in as {me.data.email}, so you can't use this invite. Switch to
-                    the account it was sent to.
+                    You're logged in as {me.data.email}, so you can't use this invite. Switch to the
+                    account it was sent to.
                   </p>
                   <Button
                     variant="outline"

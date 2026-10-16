@@ -62,11 +62,6 @@ export function formatYmd(ymd: string): string {
   });
 }
 
-// Today as "YYYY-MM-DD", used as the date picker's minimum for NEW tasks (a hint, not a rule)
-export function todayInputValue() {
-  return toDateInputValue(new Date().toISOString());
-}
-
 // Form values → what the API expects (the date picker's day becomes an exact due moment)
 export function fromFormValues(values: TaskFormValues) {
   return {

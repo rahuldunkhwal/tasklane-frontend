@@ -74,7 +74,8 @@ export function AccountForm({ user }: { user: User }) {
         toast.success('Photo updated');
         closeCrop();
       },
-      onError: (error) => toast.error("Couldn't upload photo", { description: getErrorMessage(error) }),
+      onError: (error) =>
+        toast.error("Couldn't upload photo", { description: getErrorMessage(error) }),
     });
   };
 
@@ -104,7 +105,9 @@ export function AccountForm({ user }: { user: User }) {
                 size="sm"
                 className="text-danger hover:text-danger"
                 onClick={() =>
-                  removeAvatar.mutate(undefined, { onSuccess: () => toast.success('Photo removed') })
+                  removeAvatar.mutate(undefined, {
+                    onSuccess: () => toast.success('Photo removed'),
+                  })
                 }
                 disabled={removeAvatar.isPending}
               >
@@ -128,7 +131,12 @@ export function AccountForm({ user }: { user: User }) {
           <label htmlFor="display-name" className="text-sm font-semibold">
             Display name
           </label>
-          <Input id="display-name" autoComplete="name" aria-invalid={!!errors.name} {...register('name')} />
+          <Input
+            id="display-name"
+            autoComplete="name"
+            aria-invalid={!!errors.name}
+            {...register('name')}
+          />
           {errors.name && (
             <p className="text-xs text-danger" role="alert">
               {errors.name.message}

@@ -97,7 +97,15 @@ export function matchesFilters(task: Task, filters: TaskFilters, now = new Date(
   const due = task.dueDate ? new Date(task.dueDate).getTime() : null;
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const endOfDay = (daysFromToday: number) =>
-    new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysFromToday, 23, 59, 59, 999).getTime();
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + daysFromToday,
+      23,
+      59,
+      59,
+      999,
+    ).getTime();
 
   switch (filters.due) {
     case 'overdue':

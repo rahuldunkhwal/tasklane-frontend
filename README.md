@@ -26,25 +26,27 @@ where that goes (Vite proxy in development, a rewrite in production — see Depl
 
 ## Scripts
 
-| Script              | What it does                       |
-| ------------------- | ---------------------------------- |
-| `npm run dev`       | Dev server with hot reload         |
-| `npm run build`     | Type-check, then build to `dist/`  |
-| `npm run preview`   | Serve the production build locally |
-| `npm run typecheck` | Type-check only                    |
-| `npm run lint`      | ESLint                             |
-| `npm run format`    | Format all files with Prettier     |
+| Script                 | What it does                       |
+| ---------------------- | ---------------------------------- |
+| `npm run dev`          | Dev server with hot reload         |
+| `npm run build`        | Type-check, then build to `dist/`  |
+| `npm run preview`      | Serve the production build locally |
+| `npm run typecheck`    | Type-check only                    |
+| `npm run lint`         | ESLint                             |
+| `npm run format`       | Format all files with Prettier     |
+| `npm run format:check` | Fail if any file isn't formatted   |
 
 ## Pages
 
-| Route              | Access      | What it does                                                                                   |
-| ------------------ | ----------- | ---------------------------------------------------------------------------------------------- |
+| Route               | Access     | What it does                                                                                    |
+| ------------------- | ---------- | ----------------------------------------------------------------------------------------------- |
 | `/login`, `/signup` | logged-out | Email + password forms with validation; logged-in users are sent to Home                        |
-| `/forgot-password`, `/reset-password` | logged-out | Request a reset email, then choose a new password from the emailed link       |
-| `/`                | logged-in   | Home: total / completed / overdue counts and a grid of your boards                             |
-| `/boards`          | logged-in   | Boards as lanes: board and task CRUD, drag & drop (within and between boards), search + filters |
-| `/profile`         | logged-in   | Display name, profile picture (upload with crop), change password                              |
-| `/invite/:token`   | public      | Landing page for an emailed board invite: sign up / log in with the invited email, then join   |
+| `/forgot-password`  | logged-out | Request a password-reset email                                                                  |
+| `/reset-password`   | public     | Choose a new password from the emailed link (works whether or not you're logged in)             |
+| `/`                 | logged-in  | Home: total / completed / overdue counts and a grid of your boards                              |
+| `/boards`           | logged-in  | Boards as lanes: board and task CRUD, drag & drop (within and between boards), search + filters |
+| `/profile`          | logged-in  | Display name, profile picture (upload with crop), change password                               |
+| `/invite/:token`    | public     | Landing page for an emailed board invite: sign up / log in with the invited email, then join    |
 
 ## Deployment
 

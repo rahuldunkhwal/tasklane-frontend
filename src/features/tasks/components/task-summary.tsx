@@ -4,7 +4,8 @@ import type { Task } from '@/types/api';
 import { formatDueDate, isOverdue, PRIORITY_LABELS } from '../utils';
 
 // One pill style; the colour only changes to carry real meaning, never for decoration.
-const chip = 'inline-flex items-center gap-1 rounded-full px-[9px] py-0.5 text-xs font-medium leading-4';
+const chip =
+  'inline-flex items-center gap-1 rounded-full px-[9px] py-0.5 text-xs font-medium leading-4';
 
 // What a task LOOKS like (title, description, chips), with no behaviour.
 // Shared by the real card and the floating copy shown while dragging.
@@ -16,27 +17,43 @@ export function TaskSummary({ task }: { task: Task }) {
 
   return (
     <>
-      <span className={cn('text-sm font-medium wrap-break-word', task.completed && 'text-ink-muted line-through')}>
+      <span
+        className={cn(
+          'text-sm font-medium wrap-break-word',
+          task.completed && 'text-ink-muted line-through',
+        )}
+      >
         {task.title}
       </span>
 
-      {task.description && <span className="truncate text-xs text-ink-muted">{task.description}</span>}
+      {task.description && (
+        <span className="truncate text-xs text-ink-muted">{task.description}</span>
+      )}
 
       {hasChips && (
         <span className="flex flex-wrap items-center gap-1.5">
-          {task.completed && <span className={cn(chip, 'bg-brand-tint text-brand-strong')}>Done</span>}
+          {task.completed && (
+            <span className={cn(chip, 'bg-brand-tint text-brand-strong')}>Done</span>
+          )}
           {showPriority && (
             <span
               className={cn(
                 chip,
-                task.priority === 'high' ? 'bg-warning-tint text-warning-ink' : 'bg-sunken text-ink-muted',
+                task.priority === 'high'
+                  ? 'bg-warning-tint text-warning-ink'
+                  : 'bg-sunken text-ink-muted',
               )}
             >
               {PRIORITY_LABELS[task.priority]}
             </span>
           )}
           {task.dueDate && (
-            <span className={cn(chip, overdue ? 'bg-danger-tint text-danger' : 'bg-sunken text-ink-muted')}>
+            <span
+              className={cn(
+                chip,
+                overdue ? 'bg-danger-tint text-danger' : 'bg-sunken text-ink-muted',
+              )}
+            >
               <CalendarIcon className="size-3" />
               {overdue ? `Overdue · ${formatDueDate(task.dueDate)}` : formatDueDate(task.dueDate)}
             </span>

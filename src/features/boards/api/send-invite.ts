@@ -14,6 +14,7 @@ export function useSendInvite(boardId: string) {
   return useMutation({
     mutationFn: (email: string) => sendInvite(boardId, email),
     // The reply already carries the updated lists, so the dialog needs no second request
-    onSuccess: (sharing) => queryClient.setQueryData<BoardSharing>(sharesQueryKey(boardId), sharing),
+    onSuccess: (sharing) =>
+      queryClient.setQueryData<BoardSharing>(sharesQueryKey(boardId), sharing),
   });
 }

@@ -82,7 +82,10 @@ export function TaskFiltersBar() {
             setFilters({ priority: value === ALL ? '' : (value as typeof filters.priority) })
           }
         >
-          <SelectTrigger aria-label="Filter by priority" className={`${pillTrigger} w-full sm:w-36`}>
+          <SelectTrigger
+            aria-label="Filter by priority"
+            className={`${pillTrigger} w-full sm:w-36`}
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -99,7 +102,10 @@ export function TaskFiltersBar() {
           value={filters.due || ANY}
           onValueChange={(value) => setFilters({ due: value === ANY ? '' : (value as DueFilter) })}
         >
-          <SelectTrigger aria-label="Filter by due date" className={`${pillTrigger} w-full sm:w-36`}>
+          <SelectTrigger
+            aria-label="Filter by due date"
+            className={`${pillTrigger} w-full sm:w-36`}
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

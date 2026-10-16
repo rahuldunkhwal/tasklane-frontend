@@ -20,7 +20,7 @@ export function DashboardRoute() {
 
   return (
     <div className={`${appContainer} pt-5 pb-10 sm:pt-6`}>
-      <h1 className={pageTitle}>Dashboard</h1>
+      <h1 className={pageTitle}>Home</h1>
       <p className="mt-1 text-sm text-ink-muted">Your task overview across the boards you own.</p>
 
       {stats.isError ? (
@@ -48,12 +48,25 @@ export function DashboardRoute() {
         boards={boards.data?.filter((board) => board.role === 'owner') ?? []}
         tasks={tasks.data ?? []}
         loading={boards.isPending || tasks.isPending}
+        error={boards.isError || tasks.isError}
+        onRetry={() => {
+          void boards.refetch();
+          void tasks.refetch();
+        }}
       />
     </div>
   );
 }
 
-function Overview({ total, completed, overdue }: { total: number; completed: number; overdue: number }) {
+function Overview({
+  total,
+  completed,
+  overdue,
+}: {
+  total: number;
+  completed: number;
+  overdue: number;
+}) {
   const percentDone = total === 0 ? 0 : Math.round((completed / total) * 100);
   const pct = (n: number) => (total === 0 ? 0 : (n / total) * 100);
   const openNonOverdue = Math.max(0, total - completed - overdue);
@@ -94,7 +107,12 @@ function Overview({ total, completed, overdue }: { total: number; completed: num
 
 function Tile({ label, value, tone }: { label: string; value: number; tone?: 'brand' | 'danger' }) {
   return (
-    <div className={cn('rounded-[28px] border bg-surface p-6', tone === 'danger' && 'border-danger/30')}>
+    <div
+      className={cn(
+        'rounded-[28px] border bg-surface p-6',
+        tone === 'danger' && 'border-danger/30',
+      )}
+    >
       <p className={cn('text-sm text-ink-muted', tone === 'danger' && 'text-danger')}>{label}</p>
       <p
         className={cn(
@@ -110,23 +128,46 @@ function Tile({ label, value, tone }: { label: string; value: number; tone?: 'br
 }
 
 // Listed statically so Tailwind generates each class; a board gets one by a hash of its id.
-const BOARD_COLORS = ['bg-board-1', 'bg-board-2', 'bg-board-3', 'bg-board-4', 'bg-board-5', 'bg-board-6'];
+const BOARD_COLORS = [
+  'bg-board-1',
+  'bg-board-2',
+  'bg-board-3',
+  'bg-board-4',
+  'bg-board-5',
+  'bg-board-6',
+];
 const coverFor = (id: string) =>
   BOARD_COLORS[[...id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % BOARD_COLORS.length];
 
-function YourBoards({ boards, tasks, loading }: { boards: Board[]; tasks: Task[]; loading: boolean }) {
+type YourBoardsProps = {
+  boards: Board[];
+  tasks: Task[];
+  loading: boolean;
+  error: boolean;
+  onRetry: () => void;
+};
+
+function YourBoards({ boards, tasks, loading, error, onRetry }: YourBoardsProps) {
   const gridClass = 'mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4';
 
   return (
     <section className="mt-8">
       <h2 className="text-xl font-bold">Your boards</h2>
       <p className="mt-1 text-sm text-ink-muted">
-        {boards.length === 0
+        {!loading && !error && boards.length === 0
           ? 'Create your first board to start organising tasks.'
           : 'Jump into a board, or create a new one.'}
       </p>
 
-      {loading ? (
+      {error ? (
+        // Don't show the "create your first board" empty state when we simply couldn't load them
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-[28px] border bg-surface p-6 text-sm">
+          <span className="text-ink-muted">Couldn't load your boards.</span>
+          <Button size="sm" variant="outline" onClick={onRetry}>
+            Try again
+          </Button>
+        </div>
+      ) : loading ? (
         <div className={gridClass}>
           {[1, 2, 3, 4].map((n) => (
             <Skeleton key={n} className="h-26 rounded-2xl" />
