@@ -18,7 +18,6 @@ import { getErrorMessage } from '@/lib/api-client';
 import type { Board } from '@/types/api';
 import { useShares } from '../api/get-shares';
 import { useRemoveInvite } from '../api/remove-invite';
-import { useResetInviteLink } from '../api/reset-invite-link';
 import { useSendInvite } from '../api/send-invite';
 import { useUnshareBoard } from '../api/unshare-board';
 import { shareBoardSchema, type ShareBoardInput } from '../schemas';
@@ -29,13 +28,12 @@ type ShareBoardDialogProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-// Opened from the board's ⋯ menu (owners only): invite by link or email + see/remove who has access.
-// Inviting always emails a link — the person opens it, signs up / logs in, and joins as a viewer.
+// Opened from the board's ⋯ menu (owners only): invite people by email + see/remove who has access.
+// An email with an account gets access at once; otherwise an invite only that email can use is sent.
 export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialogProps) {
   const shares = useShares(board.id, open);
   const sendInvite = useSendInvite(board.id);
   const unshareBoard = useUnshareBoard(board.id);
-  const resetLink = useResetInviteLink(board.id);
   const removeInvite = useRemoveInvite(board.id);
 
   const {
@@ -72,27 +70,7 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
       reset();
       sendInvite.reset();
       unshareBoard.reset();
-      resetLink.reset();
       removeInvite.reset();
-    }
-  };
-
-  const onResetLink = () =>
-    resetLink.mutate(undefined, {
-      onSuccess: () =>
-        toast.success('New invite link created', { description: 'The old link no longer works.' }),
-      onError: (error) =>
-        toast.error("Couldn't reset the link", { description: getErrorMessage(error) }),
-    });
-
-  const inviteLink = shares.data?.inviteLink ?? '';
-  const copyLink = async () => {
-    if (!inviteLink) return;
-    try {
-      await navigator.clipboard.writeText(inviteLink);
-      toast.success('Invite link copied');
-    } catch {
-      toast.error("Couldn't copy — select the link and copy it manually");
     }
   };
 
@@ -110,35 +88,8 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
           </DialogDescription>
         </DialogHeader>
 
-        {/* Invite link: anyone with it can join as a viewer */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium">Invite link</span>
-          {shares.isPending ? (
-            <Skeleton className="h-10 rounded-full" />
-          ) : (
-            <div className="flex gap-2">
-              <Input readOnly value={inviteLink} onFocus={(e) => e.currentTarget.select()} />
-              <Button type="button" variant="outline" onClick={() => void copyLink()}>
-                Copy
-              </Button>
-            </div>
-          )}
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-ink-muted">Anyone with this link can view the board.</p>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="text-xs"
-              onClick={onResetLink}
-              disabled={resetLink.isPending || shares.isPending}
-            >
-              {resetLink.isPending ? 'Resetting…' : 'Reset link'}
-            </Button>
-          </div>
-        </div>
-
-        {/* Invite by email: always emails the link (works whether or not they have an account) */}
+        {/* Invite by email: instant access for an existing account, otherwise an emailed invite
+            that only that address can use */}
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
           {sendInvite.isError && <FormErrorAlert message={getErrorMessage(sendInvite.error)} />}
           <Field data-invalid={!!errors.email}>

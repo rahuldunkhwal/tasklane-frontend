@@ -21,7 +21,6 @@ export function useSendInvite(boardId: string) {
       queryClient.setQueryData<BoardSharing>(sharesQueryKey(boardId), {
         shares: result.shares,
         invites: result.invites,
-        inviteLink: result.inviteLink,
       }),
   });
 }

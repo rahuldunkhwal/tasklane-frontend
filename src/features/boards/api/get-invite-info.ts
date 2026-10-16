@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 
 // Public info shown on the invite landing page (no login needed).
-// `invitedEmail` is present for an emailed invite: only that account can accept it.
-export type InviteInfo = { boardTitle: string; inviterName: string; invitedEmail?: string };
+// `invitedEmail` is the address the invite was sent to: only that account can accept it.
+export type InviteInfo = { boardTitle: string; inviterName: string; invitedEmail: string };
 
 export async function getInviteInfo(token: string): Promise<InviteInfo> {
   const response = await api.get<InviteInfo>(`/invites/${token}`);
