@@ -18,8 +18,8 @@ export function DashboardRoute() {
   const tasks = useTasks(); // no filters → all visible tasks
 
   return (
-    <div className="mx-auto w-full max-w-[1040px] px-4 pt-6 pb-10 sm:px-6 sm:pt-10">
-      <h1 className="text-[32px] leading-[38px] font-extrabold tracking-[-0.03em]">Dashboard</h1>
+    <div className="mx-auto w-full max-w-260 px-4 pt-6 pb-10 sm:px-6 sm:pt-10">
+      <h1 className="text-[32px] leading-9.5 font-extrabold tracking-[-0.03em]">Dashboard</h1>
       <p className="mt-1 text-sm text-ink-muted">Your task overview across the boards you own.</p>
 
       {stats.isError ? (
@@ -128,7 +128,7 @@ function YourBoards({ boards, tasks, loading }: { boards: Board[]; tasks: Task[]
       {loading ? (
         <div className={gridClass}>
           {[1, 2, 3, 4].map((n) => (
-            <Skeleton key={n} className="h-[104px] rounded-2xl" />
+            <Skeleton key={n} className="h-26 rounded-2xl" />
           ))}
         </div>
       ) : (
@@ -160,7 +160,7 @@ function YourBoards({ boards, tasks, loading }: { boards: Board[]; tasks: Task[]
             trigger={
               <button
                 type="button"
-                className="flex min-h-[104px] flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-border-strong/60 text-sm font-semibold text-ink-muted transition-colors outline-none hover:bg-sunken/60 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+                className="flex min-h-26 flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-border-strong/60 text-sm font-semibold text-ink-muted transition-colors outline-none hover:bg-sunken/60 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 <PlusIcon className="size-5" />
                 Create new board

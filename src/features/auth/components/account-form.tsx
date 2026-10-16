@@ -84,7 +84,7 @@ export function AccountForm({ user }: { user: User }) {
       <p className="mt-1 text-[13px] text-ink-muted">Your name and photo appear in the top bar.</p>
 
       <div className="mt-5 flex items-center gap-4">
-        <UserAvatar name={user.name} avatarUrl={user.avatarUrl} className="size-[72px] text-2xl" />
+        <UserAvatar name={user.name} avatarUrl={user.avatarUrl} className="size-18 text-2xl" />
         <div className="flex flex-col items-start gap-1.5">
           <div className="flex items-center gap-1.5">
             <Button

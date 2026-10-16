@@ -85,13 +85,13 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className="min-h-0 flex-1 pb-[68px] sm:pb-0">
+      <main className="min-h-0 flex-1 pb-17 sm:pb-0">
         <Outlet />
       </main>
 
       {/* Mobile bottom tab bar (desktop uses the top tabs) */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 flex h-[68px] border-t bg-surface sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 flex h-17 border-t bg-surface sm:hidden"
         aria-label="Main"
       >
         {TABS.map((tab) => (

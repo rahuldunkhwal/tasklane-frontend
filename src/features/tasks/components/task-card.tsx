@@ -72,7 +72,7 @@ export function TaskCard({ task, dragDisabled = false, readOnly = false }: TaskC
       )}
 
       <Checkbox
-        className="mt-0.5 size-[18px] rounded-[6px] border-2"
+        className="mt-0.5 size-4.5 rounded-[6px] border-2"
         checked={task.completed}
         disabled={readOnly} // view-only: shows done / not done, but can't be changed
         onCheckedChange={(checked) => toggleCompleted(checked === true)}

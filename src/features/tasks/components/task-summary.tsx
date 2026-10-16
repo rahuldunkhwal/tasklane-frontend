@@ -16,7 +16,7 @@ export function TaskSummary({ task }: { task: Task }) {
 
   return (
     <>
-      <span className={cn('text-sm font-medium break-words', task.completed && 'text-ink-muted line-through')}>
+      <span className={cn('text-sm font-medium wrap-break-word', task.completed && 'text-ink-muted line-through')}>
         {task.title}
       </span>
 

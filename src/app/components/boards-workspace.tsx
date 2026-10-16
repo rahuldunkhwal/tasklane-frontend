@@ -75,7 +75,7 @@ export function BoardsWorkspace() {
         ))}
       </div>
       {/* Right edge fade hints there are more boards to the right */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-[120px] bg-gradient-to-l from-background to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-30 bg-linear-to-l from-background to-transparent" />
     </div>
   );
 }

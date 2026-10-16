@@ -71,7 +71,7 @@ export function TaskFiltersBar() {
           placeholder="Search tasks…"
           aria-label="Search tasks by title"
           maxLength={100}
-          className="bg-surface pl-10 sm:w-[250px]"
+          className="bg-surface pl-10 sm:w-62.5"
         />
       </div>
 

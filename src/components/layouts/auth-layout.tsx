@@ -53,7 +53,7 @@ function MiniBoard() {
   return (
     <div
       aria-hidden
-      className="relative flex -rotate-3 gap-3 [mask-image:linear-gradient(to_bottom,black,transparent)]"
+      className="relative flex -rotate-3 gap-3 mask-[linear-gradient(to_bottom,black,transparent)]"
     >
       {columns.map((col, i) => (
         <div key={i} className="w-32 rounded-2xl bg-surface/5 p-2.5 ring-1 ring-surface/10">
