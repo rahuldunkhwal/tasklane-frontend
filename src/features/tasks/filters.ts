@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router';
-import type { TaskPriority } from '@/types/api';
+import type { Task, TaskPriority } from '@/types/api';
 
 export type DueFilter = 'overdue' | 'today' | 'week' | 'none';
 
@@ -84,4 +84,31 @@ export function toQueryParams(filters: TaskFilters, now = new Date()): Record<st
       break;
   }
   return params;
+}
+
+// The SAME rules as toQueryParams, applied in the browser to the tasks already loaded. Used to
+// show results the instant a filter changes, while the server's answer (the source of truth)
+// is still on its way. Keep the two in sync: the server's result replaces this one.
+export function matchesFilters(task: Task, filters: TaskFilters, now = new Date()): boolean {
+  const search = filters.search.trim().toLowerCase();
+  if (search && !task.title.toLowerCase().includes(search)) return false;
+  if (filters.priority && task.priority !== filters.priority) return false;
+
+  const due = task.dueDate ? new Date(task.dueDate).getTime() : null;
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const endOfDay = (daysFromToday: number) =>
+    new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysFromToday, 23, 59, 59, 999).getTime();
+
+  switch (filters.due) {
+    case 'overdue':
+      return !task.completed && due !== null && due <= now.getTime();
+    case 'today':
+      return due !== null && due >= startOfToday && due <= endOfDay(0);
+    case 'week':
+      return due !== null && due >= now.getTime() && due <= endOfDay(6);
+    case 'none':
+      return due === null;
+    default:
+      return true;
+  }
 }

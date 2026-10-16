@@ -23,7 +23,7 @@ const DUE_LABELS: Record<DueFilter, string> = {
   week: 'Next 7 days',
   none: 'No due date',
 };
-const SEARCH_DELAY_MS = 300;
+const SEARCH_DELAY_MS = 200;
 
 export function TaskFiltersBar() {
   const { filters, setFilters, clearFilters, filtering } = useTaskFilters();
