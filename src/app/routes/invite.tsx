@@ -5,7 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useMe } from '@/features/auth/api/get-me';
 import { useAcceptInvite } from '@/features/boards/api/accept-invite';
 import { useInviteInfo } from '@/features/boards/api/get-invite-info';
-import { getErrorMessage } from '@/lib/api-client';
+import { getApiError, getErrorMessage } from '@/lib/api-client';
 import { initialsOf } from '@/lib/initials';
 
 // Public landing page for an invite link: /invite/<token>?email=<invited>
@@ -33,15 +33,7 @@ export function InviteRoute() {
             <Spinner />
           </div>
         ) : info.isError ? (
-          <>
-            <h1 className="text-xl font-bold">This invite link doesn't work</h1>
-            <p className="mt-2 text-sm text-ink-muted">
-              It may have been removed or the link is incomplete. Ask the person to share it again.
-            </p>
-            <Button asChild variant="outline" className="mt-6">
-              <Link to="/">Go to Tasklane</Link>
-            </Button>
-          </>
+          <InviteError error={info.error} onRetry={() => void info.refetch()} />
         ) : (
           <>
             {/* Inviter + invitee avatars, like a hand-off */}
@@ -90,5 +82,33 @@ export function InviteRoute() {
         )}
       </div>
     </main>
+  );
+}
+
+// A dead link and "the server didn't answer" need different advice: only the first one
+// should tell the invitee to ask for a new link. Anything else (API asleep, network blip)
+// shows the real reason and lets them simply try again.
+function InviteError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
+  if (getApiError(error)?.code === 'INVALID_INVITE') {
+    return (
+      <>
+        <h1 className="text-xl font-bold">This invite link doesn't work</h1>
+        <p className="mt-2 text-sm text-ink-muted">
+          It may have been removed or the link is incomplete. Ask the person to share it again.
+        </p>
+        <Button asChild variant="outline" className="mt-6">
+          <Link to="/">Go to Tasklane</Link>
+        </Button>
+      </>
+    );
+  }
+  return (
+    <>
+      <h1 className="text-xl font-bold">Couldn't load this invite</h1>
+      <p className="mt-2 text-sm text-ink-muted">{getErrorMessage(error)}</p>
+      <Button className="mt-6" onClick={onRetry}>
+        Try again
+      </Button>
+    </>
   );
 }

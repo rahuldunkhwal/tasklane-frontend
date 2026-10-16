@@ -17,10 +17,14 @@ export function ProtectedRoute() {
     return <PageError message={getErrorMessage(me.error)} onRetry={() => void me.refetch()} />;
   }
 
-  // 3. Nobody is logged in → go to /login, and remember where they wanted to go
-  //    (replace: the protected URL doesn't stay in the Back-button history)
+  // 3. Nobody is logged in → go to /login, carrying the FULL url they wanted (path + filters)
+  //    in ?redirect=, so it survives a refresh of the login page and the login ↔ sign-up links.
+  //    PublicOnlyRoute sends them back there after login (internal paths only, see safePath).
+  //    replace: the protected URL doesn't stay in the Back-button history.
   if (!me.data) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    const returnTo = `${location.pathname}${location.search}`;
+    const query = returnTo === '/' ? '' : `?redirect=${encodeURIComponent(returnTo)}`;
+    return <Navigate to={`/login${query}`} replace />;
   }
 
   // 4. Logged in → show the page

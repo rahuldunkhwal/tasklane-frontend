@@ -17,11 +17,21 @@ export function setUnauthorizedHandler(handler: () => void) {
   onUnauthorized = handler;
 }
 
-// Runs after every response: a 401 from any request means the session is gone
+// Runs after every response. "The session is gone" is ONLY a 401 whose code is UNAUTHORIZED
+// (what requireAuth sends) on a request other than the "who is logged in?" probe:
+//  - a wrong password on the login form is also a 401 (INVALID_CREDENTIALS) — the user wasn't
+//    logged in to begin with, so there's nothing to clear;
+//  - /auth/me answering 401 is the normal logged-out state (getMe turns it into `null`), and
+//    clearing here would throw away public data being loaded next to it (the invite page).
 api.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
-    if (isAxiosError(error) && error.response?.status === 401) {
+    if (
+      isAxiosError<ApiErrorBody>(error) &&
+      error.response?.status === 401 &&
+      error.response.data?.error?.code === 'UNAUTHORIZED' &&
+      error.config?.url !== '/auth/me'
+    ) {
       onUnauthorized?.();
     }
     return Promise.reject(error);

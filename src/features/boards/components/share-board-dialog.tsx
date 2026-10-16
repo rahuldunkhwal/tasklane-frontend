@@ -50,7 +50,9 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
     sendInvite.mutate(email, {
       onSuccess: () => {
         reset(); // empty the field, ready for the next person
-        toast.success(`Invite sent to ${email}`);
+        toast.success(`Invite sent to ${email}`, {
+          description: "If it doesn't arrive in a minute, ask them to check their spam folder.",
+        });
       },
     }),
   );
