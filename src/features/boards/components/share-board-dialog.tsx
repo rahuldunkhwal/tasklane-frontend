@@ -29,7 +29,7 @@ type ShareBoardDialogProps = {
 };
 
 // Opened from the board's ⋯ menu (owners only): invite people by email + see/remove who has access.
-// An email with an account gets access at once; otherwise an invite only that email can use is sent.
+// Nobody gets access until they accept the emailed invite (which only that email can use).
 export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialogProps) {
   const shares = useShares(board.id, open);
   const sendInvite = useSendInvite(board.id);
@@ -48,18 +48,12 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
 
   const onSubmit = handleSubmit(({ email }) =>
     sendInvite.mutate(email, {
-      onSuccess: ({ status }) => {
+      onSuccess: () => {
         reset(); // empty the field, ready for the next person
-        if (status === 'shared') {
-          toast.success(`Shared with ${email}`, {
-            description: 'They already have an account, so the board is on their Boards page now.',
-          });
-        } else {
-          toast.success(`Invite sent to ${email}`, {
-            description:
-              "Only that email can use the link. If it doesn't arrive in a minute, ask them to check their spam folder.",
-          });
-        }
+        toast.success(`Invite sent to ${email}`, {
+          description:
+            "They'll get access once they accept it. If it doesn't arrive in a minute, ask them to check their spam folder.",
+        });
       },
     }),
   );
@@ -112,8 +106,7 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
               <FieldError errors={[errors.email]} />
             ) : (
               <FieldDescription>
-                Has an account? They get access right away. Otherwise we email an invite only they
-                can use.
+                We'll email them an invite only they can use. They get access once they accept it.
               </FieldDescription>
             )}
           </Field>
@@ -169,7 +162,7 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
                 <li key={invite.email} className="flex items-center justify-between gap-3 p-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{invite.email}</p>
-                    <p className="text-xs text-muted-foreground">Invited · waiting for them to join</p>
+                    <p className="text-xs text-muted-foreground">Invited · waiting for them to accept</p>
                   </div>
                   <Button
                     size="sm"

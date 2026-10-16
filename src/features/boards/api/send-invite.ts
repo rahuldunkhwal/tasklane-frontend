@@ -2,13 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { sharesQueryKey, type BoardSharing } from './get-shares';
 
-// Share a board with an email address:
-//   'shared'  → that email already has an account: they have access right now
-//   'invited' → no account yet: an invite that only that email can use was sent
-export type SendInviteResult = BoardSharing & { status: 'shared' | 'invited' };
-
-export async function sendInvite(boardId: string, email: string): Promise<SendInviteResult> {
-  const response = await api.post<SendInviteResult>(`/boards/${boardId}/invites`, { email });
+// Invite an email address to a board. Nobody gets access until they ACCEPT the emailed invite
+// (logged in with that exact email) — until then the address is listed as pending.
+export async function sendInvite(boardId: string, email: string): Promise<BoardSharing> {
+  const response = await api.post<BoardSharing>(`/boards/${boardId}/invites`, { email });
   return response.data;
 }
 
@@ -17,10 +14,6 @@ export function useSendInvite(boardId: string) {
   return useMutation({
     mutationFn: (email: string) => sendInvite(boardId, email),
     // The reply already carries the updated lists, so the dialog needs no second request
-    onSuccess: (result) =>
-      queryClient.setQueryData<BoardSharing>(sharesQueryKey(boardId), {
-        shares: result.shares,
-        invites: result.invites,
-      }),
+    onSuccess: (sharing) => queryClient.setQueryData<BoardSharing>(sharesQueryKey(boardId), sharing),
   });
 }
