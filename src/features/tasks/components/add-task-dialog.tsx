@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import type { Board } from '@/types/api';
 import { useCreateTask } from '../api/create-task';
-import { fromFormValues, todayInputValue } from '../utils';
+import { fromFormValues } from '../utils';
 import { TaskForm } from './task-form';
 
 // "+ Add task" at the bottom of a board column, and the dialog it opens
@@ -38,7 +38,6 @@ export function AddTaskDialog({ board }: { board: Board }) {
           <DialogDescription>It will be added at the bottom of “{board.title}”.</DialogDescription>
         </DialogHeader>
         <TaskForm
-          minDueDate={todayInputValue()}
           submitLabel="Add task"
           pendingLabel="Adding…"
           isPending={createTask.isPending}

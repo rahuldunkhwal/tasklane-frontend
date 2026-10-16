@@ -3,6 +3,7 @@ import { TasklaneLogo } from '@/components/tasklane-logo';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useMe } from '@/features/auth/api/get-me';
+import { useLogout } from '@/features/auth/api/logout';
 import { useAcceptInvite } from '@/features/boards/api/accept-invite';
 import { useInviteInfo } from '@/features/boards/api/get-invite-info';
 import { getApiError, getErrorMessage } from '@/lib/api-client';
@@ -12,11 +13,20 @@ import { initialsOf } from '@/lib/initials';
 export function InviteRoute() {
   const { token = '' } = useParams();
   const [params] = useSearchParams();
-  const invitedEmail = params.get('email') ?? '';
   const info = useInviteInfo(token);
   const me = useMe();
   const accept = useAcceptInvite();
+  const logout = useLogout();
   const navigate = useNavigate();
+
+  // An emailed invite is bound to one address (the server says which one). The board-wide link
+  // isn't, but may still carry ?email= to pre-fill the sign-up form.
+  const invitedEmail = info.data?.invitedEmail ?? params.get('email') ?? '';
+  // Logged in with a different account than the invite was sent to: joining would be refused,
+  // so say so up front and offer to switch accounts instead of showing a dead "Join" button.
+  const wrongAccount = Boolean(
+    me.data && info.data?.invitedEmail && me.data.email !== info.data.invitedEmail,
+  );
 
   // Carry the invited email + where to return through the sign-up / log-in forms
   const authSearch = new URLSearchParams();
@@ -52,22 +62,43 @@ export function InviteRoute() {
             <p className="mt-2 text-sm text-ink-muted">
               You'll have view-only access to this board and its tasks.
             </p>
+            {info.data.invitedEmail && (
+              <p className="mt-1 text-xs text-ink-muted">
+                This invite is for <span className="font-medium">{info.data.invitedEmail}</span>.
+              </p>
+            )}
 
             {me.data ? (
-              <div className="mt-6 flex flex-col gap-2">
-                <Button
-                  onClick={() => accept.mutate(token, { onSuccess: () => navigate('/boards') })}
-                  disabled={accept.isPending}
-                >
-                  {accept.isPending && <Spinner />}
-                  {accept.isPending ? 'Joining…' : 'Join board'}
-                </Button>
-                {accept.isError && (
+              wrongAccount ? (
+                <div className="mt-6 flex flex-col gap-2">
                   <p className="text-sm text-danger" role="alert">
-                    {getErrorMessage(accept.error)}
+                    You're logged in as {me.data.email}, so you can't use this invite. Switch to
+                    the account it was sent to.
                   </p>
-                )}
-              </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => logout.mutate()}
+                    disabled={logout.isPending}
+                  >
+                    {logout.isPending ? 'Switching…' : 'Switch account'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="mt-6 flex flex-col gap-2">
+                  <Button
+                    onClick={() => accept.mutate(token, { onSuccess: () => navigate('/boards') })}
+                    disabled={accept.isPending}
+                  >
+                    {accept.isPending && <Spinner />}
+                    {accept.isPending ? 'Joining…' : 'Join board'}
+                  </Button>
+                  {accept.isError && (
+                    <p className="text-sm text-danger" role="alert">
+                      {getErrorMessage(accept.error)}
+                    </p>
+                  )}
+                </div>
+              )
             ) : (
               <div className="mt-6 flex flex-col gap-2">
                 <Button asChild>
@@ -94,7 +125,8 @@ function InviteError({ error, onRetry }: { error: unknown; onRetry: () => void }
       <>
         <h1 className="text-xl font-bold">This invite link doesn't work</h1>
         <p className="mt-2 text-sm text-ink-muted">
-          It may have been removed or the link is incomplete. Ask the person to share it again.
+          It may have been used already, withdrawn, or the link is incomplete. Ask the person to
+          share it again.
         </p>
         <Button asChild variant="outline" className="mt-6">
           <Link to="/">Go to Tasklane</Link>

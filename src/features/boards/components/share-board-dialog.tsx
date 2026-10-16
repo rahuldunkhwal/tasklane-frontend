@@ -17,6 +17,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { getErrorMessage } from '@/lib/api-client';
 import type { Board } from '@/types/api';
 import { useShares } from '../api/get-shares';
+import { useRemoveInvite } from '../api/remove-invite';
 import { useResetInviteLink } from '../api/reset-invite-link';
 import { useSendInvite } from '../api/send-invite';
 import { useUnshareBoard } from '../api/unshare-board';
@@ -35,6 +36,7 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
   const sendInvite = useSendInvite(board.id);
   const unshareBoard = useUnshareBoard(board.id);
   const resetLink = useResetInviteLink(board.id);
+  const removeInvite = useRemoveInvite(board.id);
 
   const {
     register,
@@ -48,11 +50,18 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
 
   const onSubmit = handleSubmit(({ email }) =>
     sendInvite.mutate(email, {
-      onSuccess: () => {
+      onSuccess: ({ status }) => {
         reset(); // empty the field, ready for the next person
-        toast.success(`Invite sent to ${email}`, {
-          description: "If it doesn't arrive in a minute, ask them to check their spam folder.",
-        });
+        if (status === 'shared') {
+          toast.success(`Shared with ${email}`, {
+            description: 'They already have an account, so the board is on their Boards page now.',
+          });
+        } else {
+          toast.success(`Invite sent to ${email}`, {
+            description:
+              "Only that email can use the link. If it doesn't arrive in a minute, ask them to check their spam folder.",
+          });
+        }
       },
     }),
   );
@@ -64,6 +73,7 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
       sendInvite.reset();
       unshareBoard.reset();
       resetLink.reset();
+      removeInvite.reset();
     }
   };
 
@@ -86,8 +96,9 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
     }
   };
 
-  // Which person is being removed right now (to show "Removing…" on that row only)
+  // Which person / pending invite is being removed right now (to show "Removing…" on that row only)
   const removingId = unshareBoard.isPending ? unshareBoard.variables : undefined;
+  const removingInvite = removeInvite.isPending ? removeInvite.variables : undefined;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -149,7 +160,10 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
             {errors.email ? (
               <FieldError errors={[errors.email]} />
             ) : (
-              <FieldDescription>We'll email them a link to open this board.</FieldDescription>
+              <FieldDescription>
+                Has an account? They get access right away. Otherwise we email an invite only they
+                can use.
+              </FieldDescription>
             )}
           </Field>
         </form>
@@ -169,8 +183,9 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
           )}
 
           {unshareBoard.isError && <FormErrorAlert message={getErrorMessage(unshareBoard.error)} />}
+          {removeInvite.isError && <FormErrorAlert message={getErrorMessage(removeInvite.error)} />}
 
-          {shares.data?.shares.length === 0 && (
+          {shares.data && shares.data.shares.length === 0 && shares.data.invites.length === 0 && (
             <p className="text-sm text-muted-foreground">No one has joined yet.</p>
           )}
 
@@ -190,6 +205,29 @@ export function ShareBoardDialog({ board, open, onOpenChange }: ShareBoardDialog
                     aria-label={`Remove ${share.name}'s access`}
                   >
                     {removingId === share.userId ? 'Removing…' : 'Remove'}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Emailed invites not accepted yet: only that email can use the link */}
+          {shares.data && shares.data.invites.length > 0 && (
+            <ul className="flex flex-col divide-y rounded-lg border border-dashed">
+              {shares.data.invites.map((invite) => (
+                <li key={invite.email} className="flex items-center justify-between gap-3 p-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{invite.email}</p>
+                    <p className="text-xs text-muted-foreground">Invited · waiting for them to join</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={removeInvite.isPending}
+                    onClick={() => removeInvite.mutate(invite.email)}
+                    aria-label={`Withdraw the invite for ${invite.email}`}
+                  >
+                    {removingInvite === invite.email ? 'Removing…' : 'Remove'}
                   </Button>
                 </li>
               ))}

@@ -25,6 +25,9 @@ export type Board = {
 // One person a board is shared with → backend board.dto.ts (ShareDto)
 export type Share = { userId: string; name: string; email: string };
 
+// An emailed invite that hasn't been accepted yet → backend board.dto.ts (InviteDto)
+export type BoardInvite = { email: string; createdAt: string };
+
 export type TaskPriority = 'low' | 'medium' | 'high';
 
 export type Task = {

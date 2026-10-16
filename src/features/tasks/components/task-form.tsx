@@ -27,7 +27,6 @@ const PRIORITIES = ['low', 'medium', 'high'] as const;
 
 type TaskFormProps = {
   defaultValues?: TaskFormValues;
-  minDueDate?: string; // "YYYY-MM-DD": the earliest day the date picker offers (only a hint)
   submitLabel: string;
   pendingLabel: string;
   isPending: boolean;
@@ -40,7 +39,6 @@ type TaskFormProps = {
 // when closed, so every opening starts from defaultValues.
 export function TaskForm({
   defaultValues = EMPTY_TASK,
-  minDueDate,
   submitLabel,
   pendingLabel,
   isPending,
@@ -120,7 +118,6 @@ export function TaskForm({
               name="dueDate"
               render={({ field }) => {
                 const selected = ymdToDate(field.value);
-                const earliest = minDueDate ? ymdToDate(minDueDate) : undefined;
                 return (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -144,7 +141,6 @@ export function TaskForm({
                         selected={selected}
                         defaultMonth={selected}
                         onSelect={(date) => field.onChange(date ? dateToYmd(date) : '')}
-                        disabled={earliest ? { before: earliest } : undefined}
                         autoFocus
                       />
                       {field.value && (

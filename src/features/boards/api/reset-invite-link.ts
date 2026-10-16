@@ -15,7 +15,7 @@ export function useResetInviteLink(boardId: string) {
     // Swap the new link into the cache so the dialog shows it immediately
     onSuccess: (inviteLink) =>
       queryClient.setQueryData<BoardSharing>(sharesQueryKey(boardId), (old) =>
-        old ? { ...old, inviteLink } : { shares: [], inviteLink },
+        old ? { ...old, inviteLink } : { shares: [], invites: [], inviteLink },
       ),
   });
 }

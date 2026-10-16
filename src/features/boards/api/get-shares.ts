@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
-import type { Share } from '@/types/api';
+import type { BoardInvite, Share } from '@/types/api';
 
-// The Share dialog needs both the current viewers and the board's invite link.
-export type BoardSharing = { shares: Share[]; inviteLink: string };
+// The Share dialog needs the current viewers, the pending emailed invites and the board's link.
+export type BoardSharing = { shares: Share[]; invites: BoardInvite[]; inviteLink: string };
 
 export const sharesQueryKey = (boardId: string) => ['boards', boardId, 'shares'] as const;
 
