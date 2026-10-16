@@ -1,3 +1,4 @@
+import { appContainer, pageTitle } from '@/app/layouts/app-layout';
 import { useMe } from '@/features/auth/api/get-me';
 import { AccountForm } from '@/features/auth/components/account-form';
 import { ChangePasswordDialog } from '@/features/auth/components/change-password-dialog';
@@ -8,8 +9,8 @@ export function ProfileRoute() {
   if (!user) return null; // ProtectedRoute guarantees a logged-in user; this satisfies TypeScript
 
   return (
-    <div className="mx-auto w-full max-w-240 px-4 pt-10 pb-10 sm:px-6">
-      <h1 className="text-[32px] leading-9.5 font-extrabold tracking-[-0.03em]">Profile</h1>
+    <div className={`${appContainer} pt-5 pb-10 sm:pt-6`}>
+      <h1 className={pageTitle}>Profile</h1>
       <p className="mt-1 text-sm text-ink-muted">Manage your account.</p>
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-2">

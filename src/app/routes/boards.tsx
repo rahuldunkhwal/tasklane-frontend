@@ -1,5 +1,5 @@
 import { BoardsWorkspace } from '@/app/components/boards-workspace';
-import { appContainer } from '@/app/layouts/app-layout';
+import { appContainer, pageTitle } from '@/app/layouts/app-layout';
 import { useBoards } from '@/features/boards/api/get-boards';
 import { CreateBoardDialog } from '@/features/boards/components/create-board-dialog';
 import { TaskDragAndDrop } from '@/features/tasks/components/task-drag-and-drop';
@@ -16,9 +16,7 @@ export function BoardsRoute() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5">
-              <h1 className="text-[26px] leading-8 font-extrabold tracking-[-0.03em] sm:text-[32px] sm:leading-[38px]">
-                Boards
-              </h1>
+              <h1 className={pageTitle}>Boards</h1>
               {boards.data && boards.data.length > 0 && (
                 <span className="rounded-full bg-sunken px-2 py-0.5 text-sm font-medium text-ink-muted">
                   {boards.data.length}

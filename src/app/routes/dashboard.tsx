@@ -1,5 +1,6 @@
 import { PlusIcon } from 'lucide-react';
 import { Link } from 'react-router';
+import { appContainer, pageTitle } from '@/app/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBoards } from '@/features/boards/api/get-boards';
@@ -18,8 +19,8 @@ export function DashboardRoute() {
   const tasks = useTasks(); // no filters → all visible tasks
 
   return (
-    <div className="mx-auto w-full max-w-260 px-4 pt-6 pb-10 sm:px-6 sm:pt-10">
-      <h1 className="text-[32px] leading-9.5 font-extrabold tracking-[-0.03em]">Dashboard</h1>
+    <div className={`${appContainer} pt-5 pb-10 sm:pt-6`}>
+      <h1 className={pageTitle}>Dashboard</h1>
       <p className="mt-1 text-sm text-ink-muted">Your task overview across the boards you own.</p>
 
       {stats.isError ? (

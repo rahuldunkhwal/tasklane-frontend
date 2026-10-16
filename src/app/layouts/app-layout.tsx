@@ -14,6 +14,9 @@ import { useMe } from '@/features/auth/api/get-me';
 
 // Shared container so the navbar and the page content line up on the same 1280px grid.
 export const appContainer = 'mx-auto w-full max-w-[1280px] px-4 sm:px-6';
+// One page-title style for Home, Boards and Profile, so the pages feel like one app
+export const pageTitle =
+  'text-[26px] leading-8 font-extrabold tracking-[-0.03em] sm:text-[32px] sm:leading-[38px]';
 
 // Profile isn't a tab — it's reached from the avatar menu.
 const TABS = [
